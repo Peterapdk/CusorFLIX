@@ -10,9 +10,9 @@ export async function createCustomList(userId: string, name: string) {
 export async function addToList(params: { listId: string; mediaType: MediaType; tmdbId: number }) {
   const { listId, mediaType, tmdbId } = params;
   return prisma.listItem.upsert({
-    where: { listId_tmdbId: { listId, tmdbId } },
+    where: { listId_tmdbId_mediaType: { listId, tmdbId, mediaType } },
     create: { listId, mediaType, tmdbId },
-    update: { mediaType },
+    update: {},
   });
 }
 
@@ -25,7 +25,7 @@ export async function toggleWatchlist(userId: string, mediaType: MediaType, tmdb
   let list = await prisma.list.findFirst({ where: { userId, type: 'watchlist' } });
   if (!list) list = await prisma.list.create({ data: { userId, name: 'Watchlist', type: 'watchlist' } });
 
-  const existing = await prisma.listItem.findFirst({ where: { listId: list.id, tmdbId } });
+  const existing = await prisma.listItem.findFirst({ where: { listId: list.id, tmdbId, mediaType } });
   if (existing) {
     await prisma.listItem.delete({ where: { id: existing.id } });
     return { inWatchlist: false } as const;
