@@ -1,0 +1,19 @@
+# Copy this file to .env.local (for local dev) and set values
+
+# TMDB
+NEXT_PUBLIC_TMDB_API_KEY=
+TMDB_READ_ACCESS_TOKEN=
+NEXT_PUBLIC_TMDB_BASE_URL=https://api.themoviedb.org/3
+NEXT_PUBLIC_TMDB_V4_BASE_URL=https://api.themoviedb.org/4
+
+# Vidora
+NEXT_PUBLIC_VIDORA_BASE_URL=https://vidora.su
+NEXT_PUBLIC_VIDORA_THEME_COLOR=00ff9d
+
+# Database (Vercel Postgres)
+DATABASE_URL=
+
+# NextAuth (later)
+NEXTAUTH_SECRET=
+NEXTAUTH_URL=
+
