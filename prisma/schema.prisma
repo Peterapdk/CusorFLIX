@@ -35,6 +35,8 @@ model ListItem {
   mediaType  MediaType
   tmdbId     Int
   createdAt  DateTime  @default(now())
+
+  @@unique([listId, tmdbId])
 }
 
 enum ListType {
