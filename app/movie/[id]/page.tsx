@@ -1,7 +1,8 @@
 import { getMovieDetails } from '@/lib/tmdb';
 
-export default async function MovieDetailsPage({ params }: { params: { id: string } }) {
-  const movie = await getMovieDetails(params.id).catch(() => null);
+export default async function MovieDetailsPage(props: { params: Promise<{ id: string }> }) {
+  const { id } = await props.params;
+  const movie = await getMovieDetails(id).catch(() => null);
 
   if (!movie) {
     return (
@@ -17,7 +18,7 @@ export default async function MovieDetailsPage({ params }: { params: { id: strin
       <p className="text-white/70">{(movie as any).overview}</p>
       <div className="pt-2">
         <a
-          href={`/watch/movie/${params.id}`}
+          href={`/watch/movie/${id}`}
           className="inline-block rounded bg-white/10 px-4 py-2 ring-1 ring-white/20 hover:bg-white/15"
         >
           Play with Vidora

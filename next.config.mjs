@@ -2,7 +2,7 @@
 const nextConfig = {
   reactStrictMode: true,
   experimental: {
-    turbo: true,
+    turbo: {},
     typedRoutes: true,
     serverActions: {
       bodySizeLimit: '2mb'
