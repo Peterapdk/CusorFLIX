@@ -35,12 +35,24 @@ export default function PlayerFrame({ src, className }: PlayerFrameProps) {
   }, []);
 
   return (
-    <iframe
-      src={src}
-      className={className}
-      style={{ width: '100%', height: '100%', border: '0' }}
-      allowFullScreen
-    />
+    <div className={className} style={{ width: '100%', height: '100%' }}>
+      <div className="absolute right-3 top-3 z-10 flex gap-2">
+        <a
+          href={src}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="rounded bg-white/10 px-3 py-1 text-xs ring-1 ring-white/20 hover:bg-white/15"
+        >
+          Open in new tab
+        </a>
+      </div>
+      <iframe
+        src={src}
+        style={{ width: '100%', height: '100%', border: '0' }}
+        allowFullScreen
+        referrerPolicy="no-referrer"
+      />
+    </div>
   );
 }
 
