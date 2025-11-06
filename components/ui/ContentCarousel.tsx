@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import MediaCard from './MediaCard';
 
 // Custom icons to replace Heroicons
@@ -44,7 +44,25 @@ export default function ContentCarousel({
   watchlistIds = []
 }: ContentCarouselProps) {
   const [scrollPosition, setScrollPosition] = useState(0);
+  const [canScrollRight, setCanScrollRight] = useState(true);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  // Use IntersectionObserver for better scroll detection
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const updateScrollPosition = () => {
+      const currentScroll = container.scrollLeft;
+      setScrollPosition(currentScroll);
+      setCanScrollRight(currentScroll < (container.scrollWidth - container.clientWidth - 10));
+    };
+
+    container.addEventListener('scroll', updateScrollPosition, { passive: true });
+    // Initial check
+    updateScrollPosition();
+    return () => container.removeEventListener('scroll', updateScrollPosition);
+  }, []);
 
   const scroll = (direction: 'left' | 'right') => {
     const container = scrollContainerRef.current;
@@ -64,8 +82,6 @@ export default function ContentCarousel({
   };
 
   const canScrollLeft = scrollPosition > 0;
-  // Simple heuristic: if scrolled less than container width, we can still scroll right
-  const canScrollRight = scrollPosition < (items.length * 200); // rough estimate based on card width
 
   if (!items || items.length === 0) {
     return null;
@@ -82,6 +98,7 @@ export default function ContentCarousel({
               <button
                 onClick={() => scroll('left')}
                 disabled={!canScrollLeft}
+                aria-label="Scroll carousel left"
                 className={`p-2 rounded-full transition-colors ${
                   canScrollLeft 
                     ? 'bg-cinema-gray-dark hover:bg-cinema-gray-medium text-white' 
@@ -93,6 +110,7 @@ export default function ContentCarousel({
               <button
                 onClick={() => scroll('right')}
                 disabled={!canScrollRight}
+                aria-label="Scroll carousel right"
                 className={`p-2 rounded-full transition-colors ${
                   canScrollRight 
                     ? 'bg-cinema-gray-dark hover:bg-cinema-gray-medium text-white' 

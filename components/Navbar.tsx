@@ -48,9 +48,10 @@ export default function Navbar() {
               {/* Search Button */}
               <Link
                 href="/search"
+                aria-label="Search movies and TV shows"
                 className="p-2 text-cinema-white-muted hover:text-cinema-orange transition-colors"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
               </Link>
@@ -58,9 +59,12 @@ export default function Navbar() {
               {/* Mobile Menu Toggle */}
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
+                aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
+                aria-expanded={isMenuOpen}
+                aria-controls="mobile-menu"
                 className="md:hidden p-2 text-cinema-white-muted hover:text-cinema-orange transition-colors"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   {isMenuOpen ? (
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   ) : (
@@ -75,10 +79,10 @@ export default function Navbar() {
 
       {/* Mobile Menu Overlay */}
       {isMenuOpen && (
-        <div className="fixed inset-0 z-40 md:hidden">
-          <div className="fixed inset-0 bg-cinema-black/50 backdrop-blur-sm" onClick={() => setIsMenuOpen(false)} />
+        <div className="fixed inset-0 z-40 md:hidden" id="mobile-menu" role="dialog" aria-modal="true" aria-label="Navigation menu">
+          <div className="fixed inset-0 bg-cinema-black/50 backdrop-blur-sm" onClick={() => setIsMenuOpen(false)} aria-hidden="true" />
           <div className="fixed top-20 left-0 right-0 bg-cinema-gray-dark border-b border-cinema-gray-medium p-6">
-            <div className="space-y-4">
+            <nav className="space-y-4" aria-label="Mobile navigation">
               {navItems.map((item) => (
                 <Link
                   key={item.href}
@@ -89,7 +93,7 @@ export default function Navbar() {
                   {item.label}
                 </Link>
               ))}
-            </div>
+            </nav>
           </div>
         </div>
       )}

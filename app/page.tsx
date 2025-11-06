@@ -1,25 +1,29 @@
 import { getTrending } from '@/lib/tmdb';
 import HeroSection from '@/components/ui/HeroSection';
 import ContentCarousel from '@/components/ui/ContentCarousel';
+import logger from '@/lib/logger';
+import type { TMDBMovie, TMDBTVShow } from '@/types/tmdb';
+import { isMovie, isTVShow } from '@/types/tmdb';
 
 export const dynamic = 'force-dynamic';
+export const revalidate = 3600; // Revalidate every hour
 
 async function getTrendingData() {
   try {
     const [movies, tv] = await Promise.all([
       getTrending('movie', 'week').catch((error) => {
-        console.error('Error fetching trending movies:', error);
+        logger.error('Error fetching trending movies', { context: 'HomePage', error: error instanceof Error ? error : new Error(String(error)) });
         return { results: [] };
       }),
       getTrending('tv', 'week').catch((error) => {
-        console.error('Error fetching trending TV:', error);
+        logger.error('Error fetching trending TV', { context: 'HomePage', error: error instanceof Error ? error : new Error(String(error)) });
         return { results: [] };
       }),
     ]);
 
     return { movies, tv };
   } catch (error) {
-    console.error('Error fetching trending data:', error);
+    logger.error('Error fetching trending data', { context: 'HomePage', error: error instanceof Error ? error : new Error(String(error)) });
     return {
       movies: { results: [] },
       tv: { results: [] },
@@ -31,8 +35,12 @@ export default async function HomePage() {
   const { movies, tv } = await getTrendingData();
 
   // Add media_type to results for better component handling
-  const moviesWithType = movies.results.map((movie: any) => ({ ...movie, media_type: 'movie' as const }));
-  const tvWithType = tv.results.map((show: any) => ({ ...show, media_type: 'tv' as const }));
+  const moviesWithType = movies.results
+    .filter(isMovie)
+    .map((movie) => ({ ...movie, media_type: 'movie' as const })) as Array<TMDBMovie & { media_type: 'movie' }>;
+  const tvWithType = tv.results
+    .filter(isTVShow)
+    .map((show) => ({ ...show, media_type: 'tv' as const })) as Array<TMDBTVShow & { media_type: 'tv' }>;
 
   return (
     <main className="min-h-screen bg-cinema-black">

@@ -1,6 +1,11 @@
 import { getMovieDetails } from '@/lib/tmdb';
 import Image from 'next/image';
 import Link from 'next/link';
+import type { TMDBMovieDetails, TMDBCastMember, TMDBMovie, TMDBTVShow } from '@/types/tmdb';
+import { generateMetadata } from './metadata';
+import { generateStructuredData } from '@/lib/structured-data';
+
+export { generateMetadata };
 
 export default async function MovieDetailsPage(props: { params: Promise<{ id: string }> }) {
   const { id } = await props.params;
@@ -20,23 +25,30 @@ export default async function MovieDetailsPage(props: { params: Promise<{ id: st
     );
   }
 
-  const movieData = movie as any;
+  const movieData: TMDBMovieDetails = movie;
   const year = (movieData.release_date || "").split('-')[0];
   const runtime = movieData.runtime ? `${Math.floor(movieData.runtime / 60)}h ${movieData.runtime % 60}m` : '';
-  const genres = movieData.genres?.map((g: any) => g.name).join(', ') || 'Unknown';
+  const genres = movieData.genres?.map((g) => g.name).join(', ') || 'Unknown';
+  const structuredData = generateStructuredData(movieData);
 
   return (
-    <main className="min-h-screen bg-cinema-black">
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
+      <main className="min-h-screen bg-cinema-black">
       {/* Hero Section */}
       <div className="relative h-screen">
         {/* Background Image */}
         <div className="absolute inset-0">
           <Image
             src={`https://image.tmdb.org/t/p/original${movieData.backdrop_path || movieData.poster_path}`}
-            alt={movieData.title}
+            alt={`${movieData.title} backdrop`}
             fill
             className="object-cover"
             priority
+            sizes="100vw"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-cinema-black via-cinema-black/80 to-transparent" />
           <div className="absolute inset-0 bg-gradient-to-t from-cinema-black via-transparent to-transparent" />
@@ -99,16 +111,18 @@ export default async function MovieDetailsPage(props: { params: Promise<{ id: st
           <section className="container mx-auto px-6">
             <h2 className="text-section font-semibold text-white mb-8">Cast</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
-              {movieData.credits.cast.slice(0, 12).map((person: any) => (
+              {movieData.credits.cast.slice(0, 12).map((person: TMDBCastMember) => (
                 <div key={person.id} className="text-center">
                   <div className="w-full aspect-[2/3] bg-cinema-gray-dark rounded-lg overflow-hidden mb-3">
                     {person.profile_path ? (
                       <Image
                         src={`https://image.tmdb.org/t/p/w300${person.profile_path}`}
-                        alt={person.name}
+                        alt={`${person.name} profile`}
                         width={150}
                         height={225}
                         className="w-full h-full object-cover"
+                        loading="lazy"
+                        sizes="150px"
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-cinema-white-dim">
@@ -131,16 +145,18 @@ export default async function MovieDetailsPage(props: { params: Promise<{ id: st
           <section className="container mx-auto px-6">
             <h2 className="text-section font-semibold text-white mb-8">More Like This</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
-              {movieData.recommendations.results.slice(0, 12).map((rec: any) => (
+              {movieData.recommendations.results.slice(0, 12).map((rec: TMDBMovie | TMDBTVShow) => (
                 <Link key={rec.id} href={`/movie/${rec.id}`} className="group">
                   <div className="aspect-[2/3] bg-cinema-gray-dark rounded-lg overflow-hidden mb-3">
                     {rec.poster_path ? (
                       <Image
                         src={`https://image.tmdb.org/t/p/w300${rec.poster_path}`}
-                        alt={rec.title}
+                        alt={'title' in rec ? `${rec.title} poster` : `${rec.name} poster`}
                         width={150}
                         height={225}
                         className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        loading="lazy"
+                        sizes="150px"
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-cinema-white-dim">
@@ -151,10 +167,10 @@ export default async function MovieDetailsPage(props: { params: Promise<{ id: st
                     )}
                   </div>
                   <h3 className="text-sm font-medium text-white group-hover:text-cinema-orange transition-colors">
-                    {rec.title}
+                    {'title' in rec ? rec.title : rec.name}
                   </h3>
                   <p className="text-xs text-cinema-white-dim">
-                    {rec.release_date?.split('-')[0]}
+                    {('release_date' in rec ? rec.release_date : rec.first_air_date)?.split('-')[0]}
                   </p>
                 </Link>
               ))}
@@ -163,6 +179,7 @@ export default async function MovieDetailsPage(props: { params: Promise<{ id: st
         )}
       </div>
     </main>
+    </>
   );
 }
 

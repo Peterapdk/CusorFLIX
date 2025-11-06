@@ -37,9 +37,12 @@ export default async function WatchPage(props: {
     src = `${CINEMAOS_BASE}/player/${numericId}`;
   }
 
-  // Debug: log the constructed URL (remove in production)
+  // Debug: log the constructed URL (development only)
   if (process.env.NODE_ENV === 'development') {
-    console.log('CinemaOS URL:', src);
+    // Using dynamic import to avoid including logger in production bundle
+    import('@/lib/logger').then(({ default: logger }) => {
+      logger.debug('CinemaOS URL constructed', { context: 'WatchPage', src });
+    });
   }
 
   return (

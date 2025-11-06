@@ -1,6 +1,11 @@
 import { getTVDetails, getTVSeason } from '@/lib/tmdb';
 import Image from 'next/image';
 import Link from 'next/link';
+import type { TMDBTVShowDetails, TMDBSeason, TMDBCastMember, TMDBMovie, TMDBTVShow } from '@/types/tmdb';
+import { generateMetadata } from './metadata';
+import { generateTVStructuredData } from '@/lib/structured-data';
+
+export { generateMetadata };
 
 export default async function TVDetailsPage(props: { params: Promise<{ id: string }> }) {
   const { id } = await props.params;
@@ -20,27 +25,34 @@ export default async function TVDetailsPage(props: { params: Promise<{ id: strin
     );
   }
 
-  const tvData = tv as any;
-  const seasons = tvData.seasons || [];
+  const tvData: TMDBTVShowDetails = tv;
+  const seasons: TMDBSeason[] = tvData.seasons || [];
   const numberOfSeasons = tvData.number_of_seasons || 0;
   const numberOfEpisodes = tvData.number_of_episodes || 0;
   const year = (tvData.first_air_date || "").split('-')[0];
-  const genres = tvData.genres?.map((g: any) => g.name).join(', ') || 'Unknown';
+  const genres = tvData.genres?.map((g) => g.name).join(', ') || 'Unknown';
   const status = tvData.status || 'Unknown';
-  const networks = tvData.networks?.map((n: any) => n.name).join(', ') || 'Unknown';
+  const networks = tvData.networks?.map((n) => n.name).join(', ') || 'Unknown';
+  const structuredData = generateTVStructuredData(tvData);
 
   return (
-    <main className="min-h-screen bg-cinema-black">
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
+      <main className="min-h-screen bg-cinema-black">
       {/* Hero Section */}
       <div className="relative h-screen">
         {/* Background Image */}
         <div className="absolute inset-0">
           <Image
             src={`https://image.tmdb.org/t/p/original${tvData.backdrop_path || tvData.poster_path}`}
-            alt={tvData.name}
+            alt={`${tvData.name} backdrop`}
             fill
             className="object-cover"
             priority
+            sizes="100vw"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-cinema-black via-cinema-black/80 to-transparent" />
           <div className="absolute inset-0 bg-gradient-to-t from-cinema-black via-transparent to-transparent" />
@@ -113,61 +125,65 @@ export default async function TVDetailsPage(props: { params: Promise<{ id: strin
           <section className="container mx-auto px-6">
             <h2 className="text-section font-semibold text-white mb-8">Seasons & Episodes</h2>
             <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-              {seasons
-                .filter((season: any) => season.season_number >= 0 && season.air_date)
-                .map(async (season: any) => {
-                  // Fetch season details to get episode count
-                  const seasonDetails = await getTVSeason(id, season.season_number).catch(() => null);
-                  const episodeCount = seasonDetails ? (seasonDetails as any).episodes?.length || season.episode_count : season.episode_count;
-                  const seasonYear = season.air_date?.split('-')[0];
+              {await Promise.all(
+                seasons
+                  .filter((season) => season.season_number >= 0 && season.air_date)
+                  .map(async (season) => {
+                    // Fetch season details to get episode count
+                    const seasonDetails = await getTVSeason(id, season.season_number).catch(() => null);
+                    const episodeCount = seasonDetails ? seasonDetails.episodes?.length || season.episode_count : season.episode_count;
+                    const seasonYear = season.air_date?.split('-')[0];
 
-                  return (
-                    <div
-                      key={season.season_number}
-                      className="group bg-cinema-gray-dark rounded-lg overflow-hidden hover:bg-cinema-gray-medium transition-colors"
-                    >
-                      {/* Season Poster */}
-                      <div className="aspect-[2/3] bg-cinema-gray-medium">
-                        {season.poster_path ? (
-                          <Image
-                            src={`https://image.tmdb.org/t/p/w300${season.poster_path}`}
-                            alt={season.name || `Season ${season.season_number}`}
-                            width={150}
-                            height={225}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-cinema-white-dim">
-                            <svg className="w-12 h-12" fill="currentColor" viewBox="0 0 20 20">
-                              <path d="M2 6a2 2 0 012-2h6l2 2h6a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z" />
-                            </svg>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Season Info */}
-                      <div className="p-4">
-                        <h3 className="font-semibold text-white mb-2">
-                          {season.name || `Season ${season.season_number}`}
-                        </h3>
-                        <div className="flex items-center justify-between text-sm text-cinema-white-dim mb-3">
-                          <span>
-                            {episodeCount} {episodeCount === 1 ? 'episode' : 'episodes'}
-                          </span>
-                          {seasonYear && <span>{seasonYear}</span>}
+                    return (
+                      <div
+                        key={season.season_number}
+                        className="group bg-cinema-gray-dark rounded-lg overflow-hidden hover:bg-cinema-gray-medium transition-colors"
+                      >
+                        {/* Season Poster */}
+                        <div className="aspect-[2/3] bg-cinema-gray-medium">
+                          {season.poster_path ? (
+                            <Image
+                              src={`https://image.tmdb.org/t/p/w300${season.poster_path}`}
+                              alt={season.name || `Season ${season.season_number} poster`}
+                              width={150}
+                              height={225}
+                              className="w-full h-full object-cover"
+                              loading="lazy"
+                              sizes="150px"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-cinema-white-dim">
+                              <svg className="w-12 h-12" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M2 6a2 2 0 012-2h6l2 2h6a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z" />
+                              </svg>
+                            </div>
+                          )}
                         </div>
-                        {episodeCount > 0 && (
-                          <Link
-                            href={`/watch/tv/${id}?season=${season.season_number}&episode=1`}
-                            className="w-full block text-center bg-cinema-orange hover:bg-cinema-orange-light text-white font-medium py-2 px-3 rounded transition-colors"
-                          >
-                            Watch Season {season.season_number}
-                          </Link>
-                        )}
+
+                        {/* Season Info */}
+                        <div className="p-4">
+                          <h3 className="font-semibold text-white mb-2">
+                            {season.name || `Season ${season.season_number}`}
+                          </h3>
+                          <div className="flex items-center justify-between text-sm text-cinema-white-dim mb-3">
+                            <span>
+                              {episodeCount} {episodeCount === 1 ? 'episode' : 'episodes'}
+                            </span>
+                            {seasonYear && <span>{seasonYear}</span>}
+                          </div>
+                          {episodeCount > 0 && (
+                            <Link
+                              href={`/watch/tv/${id}?season=${season.season_number}&episode=1`}
+                              className="w-full block text-center bg-cinema-orange hover:bg-cinema-orange-light text-white font-medium py-2 px-3 rounded transition-colors"
+                            >
+                              Watch Season {season.season_number}
+                            </Link>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })
+              )}
             </div>
           </section>
         )}
@@ -177,16 +193,18 @@ export default async function TVDetailsPage(props: { params: Promise<{ id: strin
           <section className="container mx-auto px-6">
             <h2 className="text-section font-semibold text-white mb-8">Cast</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
-              {tvData.credits.cast.slice(0, 12).map((person: any) => (
+              {tvData.credits.cast.slice(0, 12).map((person: TMDBCastMember) => (
                 <div key={person.id} className="text-center">
                   <div className="w-full aspect-[2/3] bg-cinema-gray-dark rounded-lg overflow-hidden mb-3">
                     {person.profile_path ? (
                       <Image
                         src={`https://image.tmdb.org/t/p/w300${person.profile_path}`}
-                        alt={person.name}
+                        alt={`${person.name} profile`}
                         width={150}
                         height={225}
                         className="w-full h-full object-cover"
+                        loading="lazy"
+                        sizes="150px"
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-cinema-white-dim">
@@ -209,13 +227,13 @@ export default async function TVDetailsPage(props: { params: Promise<{ id: strin
           <section className="container mx-auto px-6">
             <h2 className="text-section font-semibold text-white mb-8">More Like This</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
-              {tvData.recommendations.results.slice(0, 12).map((rec: any) => (
+              {tvData.recommendations.results.slice(0, 12).map((rec: TMDBMovie | TMDBTVShow) => (
                 <Link key={rec.id} href={`/tv/${rec.id}`} className="group">
                   <div className="aspect-[2/3] bg-cinema-gray-dark rounded-lg overflow-hidden mb-3">
                     {rec.poster_path ? (
                       <Image
                         src={`https://image.tmdb.org/t/p/w300${rec.poster_path}`}
-                        alt={rec.name}
+                        alt={'name' in rec ? rec.name : rec.title || 'TV show poster'}
                         width={150}
                         height={225}
                         className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
@@ -229,10 +247,10 @@ export default async function TVDetailsPage(props: { params: Promise<{ id: strin
                     )}
                   </div>
                   <h3 className="text-sm font-medium text-white group-hover:text-cinema-orange transition-colors">
-                    {rec.name}
+                    {'name' in rec ? rec.name : rec.title}
                   </h3>
                   <p className="text-xs text-cinema-white-dim">
-                    {rec.first_air_date?.split('-')[0]}
+                    {('first_air_date' in rec ? rec.first_air_date : rec.release_date)?.split('-')[0]}
                   </p>
                 </Link>
               ))}
@@ -241,6 +259,7 @@ export default async function TVDetailsPage(props: { params: Promise<{ id: strin
         )}
       </div>
     </main>
+    </>
   );
 }
 

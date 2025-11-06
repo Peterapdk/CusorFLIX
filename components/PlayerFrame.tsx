@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import logger from '@/lib/logger';
 
 type PlayerFrameProps = {
   src: string;
@@ -17,8 +18,7 @@ export default function PlayerFrame({ src, className }: PlayerFrameProps) {
     const originalOpen = window.open;
     const blockedPopups: string[] = [];
     
-    window.open = function (...args: any[]) {
-      const url = args[0];
+    window.open = function (url?: string | URL, target?: string, features?: string): Window | null {
       if (url && typeof url === 'string') {
         // Block known ad domains and pop-up patterns
         const blockedPatterns = [
@@ -36,16 +36,16 @@ export default function PlayerFrame({ src, className }: PlayerFrameProps) {
         const isBlocked = blockedPatterns.some(pattern => pattern.test(url));
         if (isBlocked || !url.startsWith('https://cinemaos.tech')) {
           blockedPopups.push(url);
-          console.log('🚫 Blocked pop-up attempt:', url);
+          logger.adBlocker('Blocked pop-up attempt', { url, reason: 'popup' });
           // Dispatch custom event for ad blocker status
           window.dispatchEvent(new CustomEvent('adblocker:blocked', { detail: { url, reason: 'popup' } }));
           return null;
         }
         // URL passed all checks - allow legitimate CinemaOS navigation
-        return originalOpen(...args);
+        return originalOpen(url, target, features);
       }
       // Non-string URL or no URL - block for safety
-      console.log('⚠️ Blocked pop-up attempt (non-string URL):', args[0]);
+      logger.adBlocker('Blocked pop-up attempt (non-string URL)', { url: String(url) });
       return null;
     };
 
@@ -70,7 +70,7 @@ export default function PlayerFrame({ src, className }: PlayerFrameProps) {
     const checkForNewWindows = () => {
       // This is a fallback - browsers should respect window.open override
       if (window.frames.length > 1) {
-        console.log('⚠️ Multiple frames detected - monitoring for pop-ups');
+        logger.debug('Multiple frames detected - monitoring for pop-ups', { context: 'PlayerFrame' });
       }
     };
 
@@ -81,7 +81,7 @@ export default function PlayerFrame({ src, className }: PlayerFrameProps) {
       
       // Block messages from any origin other than the exact allowed origin
       if (event.origin !== allowedOrigin) {
-        console.log('🚫 Blocked message from:', event.origin);
+        logger.adBlocker('Blocked message from suspicious origin', { origin: event.origin });
         window.dispatchEvent(new CustomEvent('adblocker:blocked', { detail: { url: event.origin, reason: 'suspicious-origin' } }));
         return;
       }
@@ -93,7 +93,7 @@ export default function PlayerFrame({ src, className }: PlayerFrameProps) {
       if (blockedTypes.some(type => 
         String(messageType).toLowerCase().includes(type)
       )) {
-        console.log('🚫 Blocked ad-related message:', messageType);
+        logger.adBlocker('Blocked ad-related message', { messageType });
         window.dispatchEvent(new CustomEvent('adblocker:blocked', { detail: { url: messageType, reason: 'ad-message' } }));
         return;
       }
@@ -102,30 +102,33 @@ export default function PlayerFrame({ src, className }: PlayerFrameProps) {
       if (event.data?.redirect || event.data?.url) {
         const redirectUrl = event.data.redirect || event.data.url;
         if (redirectUrl && !redirectUrl.includes('cinemaos.tech')) {
-          console.log('🚫 Blocked redirect attempt:', redirectUrl);
+          logger.adBlocker('Blocked redirect attempt', { redirectUrl });
           window.dispatchEvent(new CustomEvent('adblocker:blocked', { detail: { url: redirectUrl, reason: 'redirect' } }));
           return;
         }
       }
 
       // Process legitimate media data messages
-      if ((event as any).data?.type === 'MEDIA_DATA') {
-        const mediaData = (event as any).data.data;
-        try {
-          const json = localStorage.getItem(STORAGE_KEY) || '{}';
-          const watchProgress = JSON.parse(json);
-          if (
-            mediaData?.id &&
-            (mediaData?.type === 'movie' || mediaData?.type === 'tv')
-          ) {
-            watchProgress[mediaData.id] = {
-              ...(watchProgress[mediaData.id] || {}),
-              ...mediaData,
-              last_updated: Date.now(),
-            };
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(watchProgress));
-          }
-        } catch {}
+      if (event.data && typeof event.data === 'object' && 'type' in event.data && event.data.type === 'MEDIA_DATA') {
+        const mediaData = 'data' in event.data ? event.data.data : null;
+        if (mediaData && typeof mediaData === 'object' && mediaData !== null) {
+          try {
+            const json = localStorage.getItem(STORAGE_KEY) || '{}';
+            const watchProgress = JSON.parse(json);
+            if (
+              'id' in mediaData &&
+              'type' in mediaData &&
+              (mediaData.type === 'movie' || mediaData.type === 'tv')
+            ) {
+              watchProgress[String(mediaData.id)] = {
+                ...(watchProgress[String(mediaData.id)] || {}),
+                ...mediaData,
+                last_updated: Date.now(),
+              };
+              localStorage.setItem(STORAGE_KEY, JSON.stringify(watchProgress));
+            }
+          } catch {}
+        }
       }
     };
 
@@ -137,7 +140,7 @@ export default function PlayerFrame({ src, className }: PlayerFrameProps) {
       blurTimer = setTimeout(() => {
         // Check if a pop-up was opened during blur
         if (window.frames.length > 1) {
-          console.log('⚠️ Potential pop-up detected during blur');
+          logger.debug('Potential pop-up detected during blur', { context: 'PlayerFrame' });
         }
       }, 100);
     };
@@ -192,7 +195,7 @@ export default function PlayerFrame({ src, className }: PlayerFrameProps) {
         sandbox="allow-same-origin allow-scripts allow-forms allow-presentation"
         loading="lazy"
         onLoad={() => {
-          console.log('CinemaOS player iframe loaded:', src);
+          logger.debug('CinemaOS player iframe loaded', { context: 'PlayerFrame', src });
         }}
         title="CinemaOS Player"
       />

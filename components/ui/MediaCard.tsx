@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
+import { memo } from 'react';
 
 type MediaItem = {
   id: number;
@@ -24,7 +25,7 @@ interface MediaCardProps {
   inWatchlist?: boolean;
 }
 
-export default function MediaCard({ 
+export default memo(function MediaCard({ 
   item, 
   size = 'medium', 
   showRanking = false, 
@@ -60,10 +61,11 @@ export default function MediaCard({
           {item.poster_path ? (
             <Image
               src={`https://image.tmdb.org/t/p/${imageSize}${item.poster_path}`}
-              alt={title}
+              alt={`${title} poster`}
               fill
               className="object-cover transition-transform duration-300 group-hover:scale-110"
-              sizes="(max-width: 768px) 160px, (max-width: 1024px) 192px, 240px"
+              sizes={size === 'small' ? '128px' : size === 'medium' ? '160px' : '192px'}
+              loading="lazy"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-cinema-white-dim">
@@ -126,4 +128,4 @@ export default function MediaCard({
       </div>
     </div>
   );
-}
+});

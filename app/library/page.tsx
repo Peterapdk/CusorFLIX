@@ -2,30 +2,11 @@ import { prisma } from '@/lib/db';
 import { getMovieDetails, getTVDetails } from '@/lib/tmdb';
 import MediaCard from '@/components/ui/MediaCard';
 import Link from 'next/link';
+import { getOrCreateDemoUser } from '@/lib/auth';
+import logger from '@/lib/logger';
+import type { TMDBMovieDetails, TMDBTVShowDetails } from '@/types/tmdb';
 
 export const dynamic = 'force-dynamic';
-
-async function getOrCreateDemoUser() {
-  try {
-    let user = await prisma.user.findFirst({
-      where: { email: 'demo@cinemarebel.local' },
-    });
-
-    if (!user) {
-      user = await prisma.user.create({
-        data: {
-          email: 'demo@cinemarebel.local',
-          name: 'Demo User',
-        },
-      });
-    }
-
-    return user.id;
-  } catch (error) {
-    console.error('Error getting/creating demo user:', error);
-    return null;
-  }
-}
 
 async function getLibraryItems(userId: string) {
   try {
@@ -41,7 +22,7 @@ async function getLibraryItems(userId: string) {
 
     return lists;
   } catch (error) {
-    console.error('Error fetching library:', error);
+    logger.error('Error fetching library', { context: 'LibraryPage', error: error instanceof Error ? error : new Error(String(error)) });
     return [];
   }
 }
@@ -51,7 +32,7 @@ async function enrichItems(items: Array<{ mediaType: string; tmdbId: number }>) 
     items.map(async (item) => {
       try {
         if (item.mediaType === 'movie') {
-          const details = await getMovieDetails(item.tmdbId) as { title: string; release_date?: string; poster_path?: string; vote_average?: number };
+          const details = await getMovieDetails(item.tmdbId) as TMDBMovieDetails;
           return {
             id: item.tmdbId,
             title: details.title,
@@ -61,7 +42,7 @@ async function enrichItems(items: Array<{ mediaType: string; tmdbId: number }>) 
             media_type: 'movie' as const,
           };
         } else {
-          const details = await getTVDetails(item.tmdbId) as { name: string; first_air_date?: string; poster_path?: string; vote_average?: number };
+          const details = await getTVDetails(item.tmdbId) as TMDBTVShowDetails;
           return {
             id: item.tmdbId,
             name: details.name,
@@ -72,7 +53,12 @@ async function enrichItems(items: Array<{ mediaType: string; tmdbId: number }>) 
           };
         }
       } catch (error) {
-        console.error(`Error fetching details for ${item.mediaType} ${item.tmdbId}:`, error);
+        logger.error(`Error fetching details for ${item.mediaType} ${item.tmdbId}`, { 
+          context: 'LibraryPage', 
+          mediaType: item.mediaType, 
+          tmdbId: item.tmdbId,
+          error: error instanceof Error ? error : new Error(String(error))
+        });
         return null;
       }
     })

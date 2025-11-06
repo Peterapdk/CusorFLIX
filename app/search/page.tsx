@@ -1,18 +1,20 @@
 import { searchMulti } from '@/lib/tmdb';
 import Link from 'next/link';
 import MediaCard from '@/components/ui/MediaCard';
+import type { TMDBMediaItem, TMDBMovie, TMDBTVShow, TMDBPerson } from '@/types/tmdb';
+import { isMovie, isTVShow } from '@/types/tmdb';
 
 export const dynamic = 'force-dynamic';
 
 export default async function SearchPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
   const params = await searchParams;
   const q = params.q?.trim() || '';
-  const data = q ? await searchMulti(q, 1).catch(() => ({ results: [] as any[] })) : { results: [] as any[] };
+  const data = q ? await searchMulti(q, 1).catch(() => ({ results: [] as TMDBMediaItem[] })) : { results: [] as TMDBMediaItem[] };
 
   // Filter out person results and organize by media type
-  const movieResults = data.results?.filter((item: any) => item.media_type === 'movie') || [];
-  const tvResults = data.results?.filter((item: any) => item.media_type === 'tv') || [];
-  const otherResults = data.results?.filter((item: any) => !['movie', 'tv'].includes(item.media_type)) || [];
+  const movieResults = data.results?.filter((item): item is TMDBMovie => isMovie(item)) || [];
+  const tvResults = data.results?.filter((item): item is TMDBTVShow => isTVShow(item)) || [];
+  const otherResults = data.results?.filter((item): item is TMDBPerson => !isMovie(item) && !isTVShow(item)) || [];
 
   return (
     <main className="min-h-screen bg-cinema-black pt-24 px-6">
@@ -72,7 +74,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
                   Movies <span className="text-cinema-orange">({movieResults.length})</span>
                 </h2>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
-                  {movieResults.map((item: any) => (
+                  {movieResults.map((item) => (
                     <MediaCard
                       key={`movie-${item.id}`}
                       item={{
@@ -94,7 +96,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
                   TV Shows <span className="text-cinema-orange">({tvResults.length})</span>
                 </h2>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
-                  {tvResults.map((item: any) => (
+                  {tvResults.map((item) => (
                     <MediaCard
                       key={`tv-${item.id}`}
                       item={{
@@ -116,7 +118,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
                   Other Results <span className="text-cinema-orange">({otherResults.length})</span>
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {otherResults.map((item: any) => (
+                  {otherResults.map((item) => (
                     <div key={`other-${item.id}`} className="bg-cinema-gray-dark rounded-lg p-4 flex items-center space-x-4">
                       <div className="w-16 h-16 bg-cinema-gray-medium rounded-lg flex items-center justify-center">
                         <svg className="w-8 h-8 text-cinema-white-dim" fill="currentColor" viewBox="0 0 20 20">
@@ -124,8 +126,8 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
                         </svg>
                       </div>
                       <div>
-                        <h3 className="text-white font-medium">{item.name || item.title}</h3>
-                        <p className="text-cinema-white-dim text-sm capitalize">{item.media_type}</p>
+                        <h3 className="text-white font-medium">{item.name}</h3>
+                        <p className="text-cinema-white-dim text-sm capitalize">{item.media_type || 'person'}</p>
                       </div>
                     </div>
                   ))}

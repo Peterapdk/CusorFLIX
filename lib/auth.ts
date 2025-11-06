@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/db';
+import logger from '@/lib/logger';
 
 /**
  * Get or create a demo user for development/testing
@@ -21,7 +22,7 @@ export async function getOrCreateDemoUser() {
 
     return user.id;
   } catch (error) {
-    console.error('Error getting/creating demo user:', error);
+    logger.error('Error getting/creating demo user', { context: 'Auth', error: error instanceof Error ? error : new Error(String(error)) });
     return null;
   }
 }

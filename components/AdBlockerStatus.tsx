@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
+import type { AdBlockerBlockedEvent } from '@/types/events';
 
 export default function AdBlockerStatus() {
   const [blockedCount, setBlockedCount] = useState(0);
@@ -8,7 +9,7 @@ export default function AdBlockerStatus() {
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    const handleBlocked = (event: CustomEvent) => {
+    const handleBlocked = (event: AdBlockerBlockedEvent) => {
       setBlockedCount((prev) => prev + 1);
       setIsVisible(true);
       

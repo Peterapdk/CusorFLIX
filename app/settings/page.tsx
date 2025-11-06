@@ -13,14 +13,17 @@ export default function SettingsPage() {
           <h2 className="text-lg font-semibold mb-4">Account</h2>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-2">Email</label>
+              <label htmlFor="email" className="block text-sm font-medium mb-2">Email</label>
               <input
+                id="email"
                 type="email"
                 disabled
+                aria-disabled="true"
+                aria-describedby="email-description"
                 className="w-full rounded bg-white/5 px-3 py-2 outline-none ring-1 ring-white/10 text-white/50"
                 placeholder="Not configured"
               />
-              <p className="mt-1 text-xs text-white/50">
+              <p id="email-description" className="mt-1 text-xs text-white/50">
                 Authentication not yet implemented
               </p>
             </div>
@@ -32,15 +35,19 @@ export default function SettingsPage() {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <label className="block text-sm font-medium">Dark Mode</label>
+                <label htmlFor="dark-mode" className="block text-sm font-medium">Dark Mode</label>
                 <p className="text-xs text-white/50 mt-1">Currently always enabled</p>
               </div>
               <input
+                id="dark-mode"
                 type="checkbox"
                 checked
                 disabled
+                aria-disabled="true"
+                aria-describedby="dark-mode-description"
                 className="rounded"
               />
+              <span id="dark-mode-description" className="sr-only">Dark mode is always enabled</span>
             </div>
           </div>
         </section>
@@ -51,10 +58,12 @@ export default function SettingsPage() {
             <button
               className="rounded bg-white/10 px-4 py-2 ring-1 ring-white/20 hover:bg-white/15 transition-colors"
               disabled
+              aria-disabled="true"
+              aria-describedby="export-description"
             >
               Export Library
             </button>
-            <p className="text-xs text-white/50">
+            <p id="export-description" className="text-xs text-white/50">
               Export functionality coming soon
             </p>
           </div>

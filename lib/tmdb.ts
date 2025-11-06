@@ -1,3 +1,12 @@
+import type { 
+  TMDBTrendingResponse, 
+  TMDBSearchResult, 
+  TMDBMovieDetails, 
+  TMDBTVShowDetails,
+  TMDBSeasonDetails,
+  MediaType as TMDBMediaType
+} from '@/types/tmdb';
+
 const TMDB_BASE_URL = process.env.NEXT_PUBLIC_TMDB_BASE_URL || 'https://api.themoviedb.org/3';
 const TMDB_V4_BASE_URL = process.env.NEXT_PUBLIC_TMDB_V4_BASE_URL || 'https://api.themoviedb.org/4';
 
@@ -5,6 +14,11 @@ const TMDB_API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY;
 const TMDB_READ_ACCESS_TOKEN = process.env.TMDB_READ_ACCESS_TOKEN;
 
 type HttpMethod = 'GET' | 'POST' | 'DELETE';
+
+interface TMDBError extends Error {
+  status?: number;
+  responseText?: string;
+}
 
 function buildHeaders(): HeadersInit {
   const headers: HeadersInit = { 'Content-Type': 'application/json' };
@@ -37,21 +51,21 @@ async function tmdbFetch<T>(path: string, init?: { method?: HttpMethod; body?: u
       method,
       headers: buildHeaders(),
       body: body ? JSON.stringify(body) : undefined,
-      // cache: 'force-cache' // tune per route as needed
+      next: { revalidate: 3600 } // Cache for 1 hour
     });
 
     if (!res.ok) {
       const text = await res.text().catch(() => '');
-      const error = new Error(`TMDB ${method} ${url.pathname} failed: ${res.status} ${res.statusText}`);
-      (error as any).status = res.status;
-      (error as any).responseText = text;
+      const error: TMDBError = new Error(`TMDB ${method} ${url.pathname} failed: ${res.status} ${res.statusText}`);
+      error.status = res.status;
+      error.responseText = text;
       throw error;
     }
 
     return res.json() as Promise<T>;
   } catch (error) {
     // Re-throw if it's already our error
-    if (error instanceof Error && (error as any).status) {
+    if (error instanceof Error && 'status' in error) {
       throw error;
     }
     // Otherwise, wrap network/parsing errors
@@ -59,26 +73,26 @@ async function tmdbFetch<T>(path: string, init?: { method?: HttpMethod; body?: u
   }
 }
 
-export type MediaType = 'movie' | 'tv';
+export type MediaType = TMDBMediaType;
 
-export async function getTrending(mediaType: MediaType = 'movie', timeWindow: 'day' | 'week' = 'week') {
-  return tmdbFetch<{ results: any[] }>(`/trending/${mediaType}/${timeWindow}`);
+export async function getTrending(mediaType: MediaType = 'movie', timeWindow: 'day' | 'week' = 'week'): Promise<TMDBTrendingResponse> {
+  return tmdbFetch<TMDBTrendingResponse>(`/trending/${mediaType}/${timeWindow}`);
 }
 
-export async function searchMulti(query: string, page = 1) {
-  return tmdbFetch<{ results: any[] }>(`/search/multi`, { query: { query, page } });
+export async function searchMulti(query: string, page = 1): Promise<TMDBSearchResult> {
+  return tmdbFetch<TMDBSearchResult>(`/search/multi`, { query: { query, page } });
 }
 
-export async function getMovieDetails(id: string | number, options?: { append_to_response?: string }) {
-  return tmdbFetch(`/movie/${id}`, { query: { language: 'en-US', append_to_response: options?.append_to_response } });
+export async function getMovieDetails(id: string | number, options?: { append_to_response?: string }): Promise<TMDBMovieDetails> {
+  return tmdbFetch<TMDBMovieDetails>(`/movie/${id}`, { query: { language: 'en-US', append_to_response: options?.append_to_response } });
 }
 
-export async function getTVDetails(id: string | number, options?: { append_to_response?: string }) {
-  return tmdbFetch(`/tv/${id}`, { query: { language: 'en-US', append_to_response: options?.append_to_response } });
+export async function getTVDetails(id: string | number, options?: { append_to_response?: string }): Promise<TMDBTVShowDetails> {
+  return tmdbFetch<TMDBTVShowDetails>(`/tv/${id}`, { query: { language: 'en-US', append_to_response: options?.append_to_response } });
 }
 
-export async function getTVSeason(id: string | number, seasonNumber: number) {
-  return tmdbFetch(`/tv/${id}/season/${seasonNumber}`, { query: { language: 'en-US' } });
+export async function getTVSeason(id: string | number, seasonNumber: number): Promise<TMDBSeasonDetails> {
+  return tmdbFetch<TMDBSeasonDetails>(`/tv/${id}/season/${seasonNumber}`, { query: { language: 'en-US' } });
 }
 
 export const tmdb = {

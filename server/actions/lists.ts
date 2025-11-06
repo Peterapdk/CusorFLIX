@@ -1,37 +1,59 @@
 'use server';
 
 import { prisma } from '@/lib/db';
-import type { MediaType } from '@/lib/tmdb';
+import logger from '@/lib/logger';
+
+type MediaType = 'movie' | 'tv'; // Prisma MediaType enum
 
 export async function createCustomList(userId: string, name: string) {
-  return prisma.list.create({ data: { userId, name, type: 'custom' } });
+  try {
+    return await prisma.list.create({ data: { userId, name, type: 'custom' } });
+  } catch (error) {
+    logger.error('Error creating custom list', { context: 'ServerActions', error: error instanceof Error ? error : new Error(String(error)) });
+    throw new Error('Failed to create custom list');
+  }
 }
 
 export async function addToList(params: { listId: string; mediaType: MediaType; tmdbId: number }) {
-  const { listId, mediaType, tmdbId } = params;
-  return prisma.listItem.upsert({
-    where: { listId_tmdbId_mediaType: { listId, tmdbId, mediaType } },
-    create: { listId, mediaType, tmdbId },
-    update: {},
-  });
+  try {
+    const { listId, mediaType, tmdbId } = params;
+    return await prisma.listItem.upsert({
+      where: { listId_tmdbId_mediaType: { listId, tmdbId, mediaType } },
+      create: { listId, mediaType, tmdbId },
+      update: {},
+    });
+  } catch (error) {
+    logger.error('Error adding item to list', { context: 'ServerActions', error: error instanceof Error ? error : new Error(String(error)) });
+    throw new Error('Failed to add item to list');
+  }
 }
 
 export async function removeFromList(itemId: string) {
-  await prisma.listItem.delete({ where: { id: itemId } });
-  return { ok: true } as const;
+  try {
+    await prisma.listItem.delete({ where: { id: itemId } });
+    return { ok: true } as const;
+  } catch (error) {
+    logger.error('Error removing item from list', { context: 'ServerActions', error: error instanceof Error ? error : new Error(String(error)) });
+    throw new Error('Failed to remove item from list');
+  }
 }
 
 export async function toggleWatchlist(userId: string, mediaType: MediaType, tmdbId: number) {
-  let list = await prisma.list.findFirst({ where: { userId, type: 'watchlist' } });
-  if (!list) list = await prisma.list.create({ data: { userId, name: 'Watchlist', type: 'watchlist' } });
+  try {
+    let list = await prisma.list.findFirst({ where: { userId, type: 'watchlist' } });
+    if (!list) {
+      list = await prisma.list.create({ data: { userId, name: 'Watchlist', type: 'watchlist' } });
+    }
 
-  const existing = await prisma.listItem.findFirst({ where: { listId: list.id, tmdbId, mediaType } });
-  if (existing) {
-    await prisma.listItem.delete({ where: { id: existing.id } });
-    return { inWatchlist: false } as const;
+    const existing = await prisma.listItem.findFirst({ where: { listId: list.id, tmdbId, mediaType } });
+    if (existing) {
+      await prisma.listItem.delete({ where: { id: existing.id } });
+      return { inWatchlist: false } as const;
+    }
+    await prisma.listItem.create({ data: { listId: list.id, mediaType, tmdbId } });
+    return { inWatchlist: true } as const;
+  } catch (error) {
+    logger.error('Error toggling watchlist', { context: 'ServerActions', error: error instanceof Error ? error : new Error(String(error)) });
+    throw new Error('Failed to toggle watchlist');
   }
-  await prisma.listItem.create({ data: { listId: list.id, mediaType, tmdbId } });
-  return { inWatchlist: true } as const;
 }
-
-
