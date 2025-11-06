@@ -1,6 +1,16 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'image.tmdb.org',
+        port: '',
+        pathname: '/**',
+      },
+    ],
+  },
   experimental: {
     turbo: {},
     typedRoutes: true,
@@ -20,8 +30,11 @@ const nextConfig = {
               "img-src 'self' https://image.tmdb.org data:",
               "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
               "style-src 'self' 'unsafe-inline'",
-              "frame-src https://vidora.su",
-              "connect-src 'self' https://api.themoviedb.org"
+              "frame-src https://cinemaos.tech",
+              "frame-ancestors 'self'",
+              "connect-src 'self' https://api.themoviedb.org",
+              "base-uri 'self'",
+              "form-action 'self'"
             ].join('; '),
           },
         ],

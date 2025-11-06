@@ -3,17 +3,92 @@
 @tailwind utilities;
 
 :root {
-  --background: #0b0f14;
-  --foreground: #e7eef7;
+  /* CinemaOS-inspired color scheme */
+  --background: #000000;
+  --foreground: #ffffff;
+  --cinema-black: #000000;
+  --cinema-black-light: #0a0a0a;
+  --cinema-gray-dark: #1a1a1a;
+  --cinema-gray-medium: #2a2a2a;
+  --cinema-gray-light: #3a3a3a;
+  --cinema-orange: #ff4757;
+  --cinema-orange-light: #ff3838;
+  --cinema-red: #ff6b6b;
+  --cinema-green: #2ed573;
+  --cinema-yellow: #ffa502;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 html, body {
   height: 100%;
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
+  background: var(--cinema-black);
   color: var(--foreground);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  overflow-x: hidden;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--cinema-gray-dark);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--cinema-gray-light);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--cinema-orange);
+}
+
+/* Loading animations */
+@keyframes pulse-orange {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse-orange {
+  animation: pulse-orange 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Button hover effects */
+.btn-primary {
+  @apply bg-cinema-orange hover:bg-cinema-orange-light text-white font-semibold py-3 px-6 rounded transition-all duration-300 hover:scale-105;
+}
+
+.btn-secondary {
+  @apply bg-cinema-gray-dark hover:bg-cinema-gray-medium text-white font-medium py-2 px-4 rounded transition-all duration-300;
+}
+
+/* Card hover effects */
+.card-hover {
+  @apply transition-all duration-300 hover:scale-105 hover:z-10;
+}
+
+/* Text gradient effect */
+.text-gradient {
+  background: linear-gradient(135deg, var(--cinema-orange), var(--cinema-red));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 

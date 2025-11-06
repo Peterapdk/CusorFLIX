@@ -16,7 +16,7 @@ function buildHeaders(): HeadersInit {
   return headers;
 }
 
-async function tmdbFetch<T>(path: string, init?: { method?: HttpMethod; body?: unknown; query?: Record<string, string | number | boolean | undefined> }): Promise<T> {
+async function tmdbFetch<T>(path: string, init?: { method?: HttpMethod; body?: unknown; query?: Record<string, string | number | boolean | undefined> }): Promise<T> {                                                                          
   const { method = 'GET', body, query } = init || {};
 
   const base = TMDB_BASE_URL.replace(/\/$/, '');
@@ -24,7 +24,7 @@ async function tmdbFetch<T>(path: string, init?: { method?: HttpMethod; body?: u
 
   if (query) {
     for (const [k, v] of Object.entries(query)) {
-      if (v !== undefined && v !== null) url.searchParams.set(k, String(v));
+      if (v !== undefined && v !== null) url.searchParams.set(k, String(v));    
     }
   }
 
@@ -32,19 +32,31 @@ async function tmdbFetch<T>(path: string, init?: { method?: HttpMethod; body?: u
     url.searchParams.set('api_key', TMDB_API_KEY);
   }
 
-  const res = await fetch(url.toString(), {
-    method,
-    headers: buildHeaders(),
-    body: body ? JSON.stringify(body) : undefined,
-    // cache: 'force-cache' // tune per route as needed
-  });
+  try {
+    const res = await fetch(url.toString(), {
+      method,
+      headers: buildHeaders(),
+      body: body ? JSON.stringify(body) : undefined,
+      // cache: 'force-cache' // tune per route as needed
+    });
 
-  if (!res.ok) {
-    const text = await res.text().catch(() => '');
-    throw new Error(`TMDB ${method} ${url.pathname} failed: ${res.status} ${res.statusText} ${text}`);
+    if (!res.ok) {
+      const text = await res.text().catch(() => '');
+      const error = new Error(`TMDB ${method} ${url.pathname} failed: ${res.status} ${res.statusText}`);
+      (error as any).status = res.status;
+      (error as any).responseText = text;
+      throw error;
+    }
+
+    return res.json() as Promise<T>;
+  } catch (error) {
+    // Re-throw if it's already our error
+    if (error instanceof Error && (error as any).status) {
+      throw error;
+    }
+    // Otherwise, wrap network/parsing errors
+    throw new Error(`TMDB request failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
-
-  return res.json() as Promise<T>;
 }
 
 export type MediaType = 'movie' | 'tv';

@@ -1,3 +1,6 @@
 ---
 alwaysApply: true
 ---
+Always use Tailwind for styling
+Use Framer Motion for animations
+Follow component naming conventions
