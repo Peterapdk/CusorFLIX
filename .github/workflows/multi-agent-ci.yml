@@ -1,0 +1,64 @@
+name: Multi-Agent CI
+
+on:
+  pull_request:
+    branches: [ main ]
+    types: [opened, synchronize, reopened]
+  push:
+    branches: [ main ]
+
+jobs:
+  lint-and-build:
+    name: Lint and Build
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Run ESLint
+        run: npm run lint
+        
+      - name: Build project
+        run: npm run build
+        
+      - name: Type check
+        run: npx tsc --noEmit
+
+  pr-checks:
+    name: PR Validation
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: Check PR title format
+        run: |
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          if [[ ! "$PR_TITLE" =~ ^(feat|fix|refactor|docs|style|test|chore)(\(.+\))?: ]]; then
+            echo "❌ PR title must follow format: type(scope): description"
+            echo "Example: feat(types): Add TMDB type definitions"
+            exit 1
+          fi
+          echo "✅ PR title format is valid"
+          
+      - name: Check for agent identifier
+        run: |
+          PR_BODY="${{ github.event.pull_request.body }}"
+          if [[ ! "$PR_BODY" =~ Agent\ Name|agent|Agent ]]; then
+            echo "⚠️  Warning: PR body should include agent identifier"
+          fi
+

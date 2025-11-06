@@ -21,4 +21,7 @@ pnpm-debug.log*
 .idea
 .vscode
 
+# Agent-specific files
+.agent-state/
+*.agent.log
 
