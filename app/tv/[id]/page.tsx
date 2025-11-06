@@ -173,10 +173,10 @@ export default async function TVDetailsPage(props: { params: Promise<{ id: strin
                           </div>
                           {episodeCount > 0 && (
                             <Link
-                              href={`/watch/tv/${id}?season=${season.season_number}&episode=1`}
+                              href={`/tv/${id}/season/${season.season_number}`}
                               className="w-full block text-center bg-cinema-orange hover:bg-cinema-orange-light text-white font-medium py-2 px-3 rounded transition-colors"
                             >
-                              Watch Season {season.season_number}
+                              View Episodes
                             </Link>
                           )}
                         </div>
