@@ -72,3 +72,41 @@ export async function toggleWatchlistWithAuth(mediaType: MediaType, tmdbId: numb
     return { error: 'Failed to update watchlist', inWatchlist: null } as const;
   }
 }
+
+export async function updateListName(listId: string, name: string) {
+  try {
+    await prisma.list.update({
+      where: { id: listId },
+      data: { name },
+    });
+    return { ok: true } as const;
+  } catch (error) {
+    logger.error('Error updating list name', { context: 'ServerActions', error: error instanceof Error ? error : new Error(String(error)) });
+    throw new Error('Failed to update list name');
+  }
+}
+
+export async function deleteList(listId: string) {
+  try {
+    await prisma.list.delete({ where: { id: listId } });
+    return { ok: true } as const;
+  } catch (error) {
+    logger.error('Error deleting list', { context: 'ServerActions', error: error instanceof Error ? error : new Error(String(error)) });
+    throw new Error('Failed to delete list');
+  }
+}
+
+export async function createCustomListWithAuth(name: string) {
+  try {
+    const { getOrCreateDemoUser } = await import('@/lib/auth');
+    const userId = await getOrCreateDemoUser();
+    if (!userId) {
+      return { error: 'Please log in to create lists', list: null } as const;
+    }
+    const list = await createCustomList(userId, name);
+    return { list } as const;
+  } catch (error) {
+    logger.error('Error creating custom list with auth', { context: 'ServerActions', error: error instanceof Error ? error : new Error(String(error)) });
+    return { error: 'Failed to create list', list: null } as const;
+  }
+}
