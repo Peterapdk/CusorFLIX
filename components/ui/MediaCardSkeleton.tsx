@@ -12,15 +12,15 @@ export default function MediaCardSkeleton({ size = 'medium' }: MediaCardSkeleton
   return (
     <div className={`${sizeClasses[size]} animate-pulse`}>
       {/* Poster Skeleton */}
-      <div className="aspect-[2/3] bg-cinema-gray-medium rounded-lg mb-3" />
+      <div className="aspect-[2/3] bg-muted rounded-lg mb-3" />
       
       {/* Title Skeleton */}
-      <div className="h-4 w-3/4 bg-cinema-gray-medium rounded mb-2" />
+      <div className="h-4 w-3/4 bg-muted rounded mb-2" />
       
       {/* Metadata Skeleton */}
       <div className="flex items-center justify-between">
-        <div className="h-3 w-16 bg-cinema-gray-medium rounded" />
-        <div className="h-3 w-12 bg-cinema-gray-medium rounded" />
+        <div className="h-3 w-16 bg-muted rounded" />
+        <div className="h-3 w-12 bg-muted rounded" />
       </div>
     </div>
   );

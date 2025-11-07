@@ -56,7 +56,7 @@ export default function HeroSection({ featuredContent }: HeroSectionProps) {
           blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-t from-cinema-black via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
       </div>
 
       {/* Content */}
@@ -70,12 +70,12 @@ export default function HeroSection({ featuredContent }: HeroSectionProps) {
             </div>
 
             {/* Title */}
-            <h1 className="text-hero font-bold text-white leading-tight">
+            <h1 className="text-hero font-bold text-foreground leading-tight">
               {title}
             </h1>
 
             {/* Rating and Year */}
-            <div className="flex items-center space-x-4 text-cinema-white">
+            <div className="flex items-center space-x-4 text-foreground">
               <div className="flex items-center space-x-2">
                 <span className="text-2xl font-bold">{sampleContent.vote_average.toFixed(1)}</span>
                 <div className="flex">
@@ -98,7 +98,7 @@ export default function HeroSection({ featuredContent }: HeroSectionProps) {
               <span className="text-xl">{year}</span>
               <div className="flex space-x-2">
                 {genres.map((genre) => (
-                  <span key={genre} className="px-3 py-1 bg-cinema-gray-dark rounded text-sm">
+                  <span key={genre} className="px-3 py-1 bg-card rounded text-sm text-card-foreground">
                     {genre}
                   </span>
                 ))}

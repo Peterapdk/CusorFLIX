@@ -3,19 +3,87 @@
 @tailwind utilities;
 
 :root {
-  /* CinemaOS-inspired color scheme */
-  --background: #000000;
-  --foreground: #ffffff;
-  --cinema-black: #000000;
-  --cinema-black-light: #0a0a0a;
-  --cinema-gray-dark: #1a1a1a;
-  --cinema-gray-medium: #2a2a2a;
-  --cinema-gray-light: #3a3a3a;
-  --cinema-orange: #ff4757;
-  --cinema-orange-light: #ff3838;
-  --cinema-red: #ff6b6b;
-  --cinema-green: #2ed573;
-  --cinema-yellow: #ffa502;
+  /* Light mode - CinemaOS-inspired light theme */
+  --background: oklch(0.98 0 0);
+  --foreground: oklch(0.15 0 0);
+  --card: oklch(0.96 0 0);
+  --card-foreground: oklch(0.15 0 0);
+  --popover: oklch(0.96 0 0);
+  --popover-foreground: oklch(0.15 0 0);
+  
+  /* CinemaOS Orange as Primary */
+  --primary: oklch(0.6 0.22 25); /* CinemaOS orange #ff4757 */
+  --primary-foreground: oklch(1 0 0);
+  
+  --secondary: oklch(0.85 0.02 0);
+  --secondary-foreground: oklch(0.15 0 0);
+  --muted: oklch(0.6 0 0);
+  --muted-foreground: oklch(0.5 0 0);
+  --accent: oklch(0.6 0.22 25);
+  --accent-foreground: oklch(1 0 0);
+  --destructive: oklch(0.55 0.22 25); /* CinemaOS red */
+  --destructive-foreground: oklch(1 0 0);
+  --border: oklch(0.88 0.01 0);
+  --input: oklch(0.96 0 0);
+  --ring: oklch(0.6 0.22 25);
+  
+  /* CinemaOS-specific colors (light mode) */
+  --cinema-black: oklch(0 0 0);
+  --cinema-black-light: oklch(0.05 0 0);
+  --cinema-gray-dark: oklch(0.15 0 0);
+  --cinema-gray-medium: oklch(0.25 0 0);
+  --cinema-gray-light: oklch(0.35 0 0);
+  --cinema-orange: oklch(0.6 0.22 25); /* #ff4757 */
+  --cinema-orange-light: oklch(0.65 0.22 25); /* #ff3838 */
+  --cinema-red: oklch(0.55 0.22 25); /* #ff6b6b */
+  --cinema-green: oklch(0.7 0.15 150); /* #2ed573 */
+  --cinema-yellow: oklch(0.75 0.15 80); /* #ffa502 */
+  --cinema-white: oklch(1 0 0);
+  --cinema-white-muted: oklch(0.7 0 0);
+  --cinema-white-dim: oklch(0.5 0 0);
+  
+  --radius: 0.5rem;
+}
+
+/* Dark mode - CinemaOS dark theme (default) */
+.dark {
+  --background: oklch(0.06 0 0); /* CinemaOS black */
+  --foreground: oklch(0.95 0.01 0);
+  --card: oklch(0.12 0.01 0); /* CinemaOS gray-dark */
+  --card-foreground: oklch(0.95 0.01 0);
+  --popover: oklch(0.12 0.01 0);
+  --popover-foreground: oklch(0.95 0.01 0);
+  
+  /* CinemaOS Orange as Primary */
+  --primary: oklch(0.6 0.22 25); /* CinemaOS orange #ff4757 */
+  --primary-foreground: oklch(1 0 0);
+  
+  --secondary: oklch(0.18 0.01 0); /* CinemaOS gray-medium */
+  --secondary-foreground: oklch(0.9 0.01 0);
+  --muted: oklch(0.35 0 0);
+  --muted-foreground: oklch(0.65 0 0);
+  --accent: oklch(0.6 0.22 25);
+  --accent-foreground: oklch(1 0 0);
+  --destructive: oklch(0.55 0.22 25); /* CinemaOS red */
+  --destructive-foreground: oklch(1 0 0);
+  --border: oklch(0.2 0.01 0);
+  --input: oklch(0.12 0.01 0);
+  --ring: oklch(0.6 0.22 25);
+  
+  /* CinemaOS-specific colors (dark mode) */
+  --cinema-black: oklch(0 0 0);
+  --cinema-black-light: oklch(0.05 0 0);
+  --cinema-gray-dark: oklch(0.12 0.01 0);
+  --cinema-gray-medium: oklch(0.18 0.01 0);
+  --cinema-gray-light: oklch(0.25 0.01 0);
+  --cinema-orange: oklch(0.6 0.22 25); /* #ff4757 */
+  --cinema-orange-light: oklch(0.65 0.22 25); /* #ff3838 */
+  --cinema-red: oklch(0.55 0.22 25); /* #ff6b6b */
+  --cinema-green: oklch(0.7 0.15 150); /* #2ed573 */
+  --cinema-yellow: oklch(0.75 0.15 80); /* #ffa502 */
+  --cinema-white: oklch(0.95 0.01 0);
+  --cinema-white-muted: oklch(0.7 0 0);
+  --cinema-white-dim: oklch(0.5 0 0);
 }
 
 * {
@@ -29,11 +97,18 @@ html, body {
   scroll-behavior: smooth;
 }
 
-body {
-  background: var(--cinema-black);
-  color: var(--foreground);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
-  overflow-x: hidden;
+@layer base {
+  * {
+    @apply border-border;
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  }
+  
+  body {
+    @apply bg-background text-foreground;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+    overflow-x: hidden;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
 }
 
 /* Custom scrollbar */
