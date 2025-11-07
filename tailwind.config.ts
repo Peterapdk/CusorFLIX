@@ -5,28 +5,65 @@ export default {
     './app/**/*.{ts,tsx}',
     './components/**/*.{ts,tsx}',
   ],
+  darkMode: ['class'], // Enable class-based dark mode
   theme: {
     extend: {
       colors: {
-        // CinemaOS-inspired color palette
-        cinema: {
-          black: '#000000',
-          'black-light': '#0a0a0a',
-          'gray-dark': '#1a1a1a',
-          'gray-medium': '#2a2a2a',
-          'gray-light': '#3a3a3a',
-          orange: '#ff4757',
-          'orange-light': '#ff3838',
-          red: '#ff6b6b',
-          green: '#2ed573',
-          yellow: '#ffa502',
-          white: '#ffffff',
-          'white-muted': 'rgba(255, 255, 255, 0.7)',
-          'white-dim': 'rgba(255, 255, 255, 0.5)',
-        },
-        // Keep existing CSS variables for compatibility
+        // Theme-aware colors using CSS variables
         background: 'var(--background)',
         foreground: 'var(--foreground)',
+        card: {
+          DEFAULT: 'var(--card)',
+          foreground: 'var(--card-foreground)',
+        },
+        popover: {
+          DEFAULT: 'var(--popover)',
+          foreground: 'var(--popover-foreground)',
+        },
+        primary: {
+          DEFAULT: 'var(--primary)',
+          foreground: 'var(--primary-foreground)',
+        },
+        secondary: {
+          DEFAULT: 'var(--secondary)',
+          foreground: 'var(--secondary-foreground)',
+        },
+        muted: {
+          DEFAULT: 'var(--muted)',
+          foreground: 'var(--muted-foreground)',
+        },
+        accent: {
+          DEFAULT: 'var(--accent)',
+          foreground: 'var(--accent-foreground)',
+        },
+        destructive: {
+          DEFAULT: 'var(--destructive)',
+          foreground: 'var(--destructive-foreground)',
+        },
+        border: 'var(--border)',
+        input: 'var(--input)',
+        ring: 'var(--ring)',
+        // CinemaOS-specific colors (theme-aware via CSS variables)
+        cinema: {
+          black: 'var(--cinema-black)',
+          'black-light': 'var(--cinema-black-light)',
+          'gray-dark': 'var(--cinema-gray-dark)',
+          'gray-medium': 'var(--cinema-gray-medium)',
+          'gray-light': 'var(--cinema-gray-light)',
+          orange: 'var(--cinema-orange)',
+          'orange-light': 'var(--cinema-orange-light)',
+          red: 'var(--cinema-red)',
+          green: 'var(--cinema-green)',
+          yellow: 'var(--cinema-yellow)',
+          white: 'var(--cinema-white)',
+          'white-muted': 'var(--cinema-white-muted)',
+          'white-dim': 'var(--cinema-white-dim)',
+        },
+      },
+      borderRadius: {
+        lg: 'var(--radius)',
+        md: 'calc(var(--radius) - 2px)',
+        sm: 'calc(var(--radius) - 4px)',
       },
       fontSize: {
         'hero': ['4rem', { lineHeight: '1.1', fontWeight: '700' }],

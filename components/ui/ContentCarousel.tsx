@@ -92,7 +92,7 @@ export default function ContentCarousel({
       {/* Section Header */}
       <div className="container mx-auto px-6 mb-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-section font-semibold text-white">{title}</h2>
+          <h2 className="text-section font-semibold text-foreground">{title}</h2>
           {items.length > 6 && (
             <div className="flex space-x-2">
               <button
@@ -101,8 +101,8 @@ export default function ContentCarousel({
                 aria-label="Scroll carousel left"
                 className={`p-2 rounded-full transition-colors ${
                   canScrollLeft 
-                    ? 'bg-cinema-gray-dark hover:bg-cinema-gray-medium text-white' 
-                    : 'bg-cinema-gray-dark text-cinema-gray-light cursor-not-allowed'
+                    ? 'bg-secondary hover:bg-secondary/80 text-secondary-foreground' 
+                    : 'bg-secondary text-muted-foreground cursor-not-allowed'
                 }`}
               >
                 <ChevronLeftIcon className="w-5 h-5" />
@@ -113,8 +113,8 @@ export default function ContentCarousel({
                 aria-label="Scroll carousel right"
                 className={`p-2 rounded-full transition-colors ${
                   canScrollRight 
-                    ? 'bg-cinema-gray-dark hover:bg-cinema-gray-medium text-white' 
-                    : 'bg-cinema-gray-dark text-cinema-gray-light cursor-not-allowed'
+                    ? 'bg-secondary hover:bg-secondary/80 text-secondary-foreground' 
+                    : 'bg-secondary text-muted-foreground cursor-not-allowed'
                 }`}
               >
                 <ChevronRightIcon className="w-5 h-5" />
@@ -130,12 +130,12 @@ export default function ContentCarousel({
           <>
             {/* Left Gradient */}
             {canScrollLeft && (
-              <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-cinema-black to-transparent z-10 pointer-events-none" />
+              <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
             )}
             
             {/* Right Gradient */}
             {canScrollRight && (
-              <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-cinema-black to-transparent z-10 pointer-events-none" />
+              <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
             )}
           </>
         )}

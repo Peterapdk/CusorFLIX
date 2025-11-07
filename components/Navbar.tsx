@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import type { Route } from 'next';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -17,15 +18,15 @@ export default function Navbar() {
   return (
     <>
       {/* Main Navigation */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-cinema-black/95 backdrop-blur-md border-b border-cinema-gray-dark">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border">
         <nav className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             {/* Logo */}
             <Link href="/" className="flex items-center space-x-2 group">
               <div className="w-8 h-8 bg-gradient-to-br from-cinema-orange to-cinema-red rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">C</span>
+                <span className="text-primary-foreground font-bold text-sm">C</span>
               </div>
-              <span className="text-xl font-bold text-white group-hover:text-cinema-orange transition-colors">
+              <span className="text-xl font-bold text-foreground group-hover:text-cinema-orange transition-colors">
                 CinemaRebel
               </span>
             </Link>
@@ -45,6 +46,9 @@ export default function Navbar() {
 
             {/* Search and User Actions */}
             <div className="flex items-center space-x-4">
+              {/* Theme Toggle */}
+              <ThemeToggle />
+
               {/* Search Button */}
               <Link
                 href="/search"
@@ -80,8 +84,8 @@ export default function Navbar() {
       {/* Mobile Menu Overlay */}
       {isMenuOpen && (
         <div className="fixed inset-0 z-40 md:hidden" id="mobile-menu" role="dialog" aria-modal="true" aria-label="Navigation menu">
-          <div className="fixed inset-0 bg-cinema-black/50 backdrop-blur-sm" onClick={() => setIsMenuOpen(false)} aria-hidden="true" />
-          <div className="fixed top-20 left-0 right-0 bg-cinema-gray-dark border-b border-cinema-gray-medium p-6">
+          <div className="fixed inset-0 bg-background/50 backdrop-blur-sm" onClick={() => setIsMenuOpen(false)} aria-hidden="true" />
+          <div className="fixed top-20 left-0 right-0 bg-card border-b border-border p-6">
             <nav className="space-y-4" aria-label="Mobile navigation">
               {navItems.map((item) => (
                 <Link

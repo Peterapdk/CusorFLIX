@@ -86,7 +86,7 @@ async function TrendingTVShows() {
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen bg-cinema-black">
+    <main className="min-h-screen bg-background">
       {/* Hero Section with Suspense */}
       <Suspense fallback={<HeroSkeleton />}>
         <HeroContent />

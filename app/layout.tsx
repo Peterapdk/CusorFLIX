@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import Navbar from '@/components/Navbar';
 import ErrorBoundary from '@/components/ErrorBoundary';
+import { ThemeProvider } from '@/components/theme-provider';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -29,20 +30,27 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`scroll-smooth ${inter.variable}`}>
-      <body className="min-h-screen bg-cinema-black text-white antialiased font-sans">
-        <a
-          href="#main-content"
-          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-cinema-orange focus:text-white focus:rounded"
+    <html lang="en" className={`scroll-smooth ${inter.variable}`} suppressHydrationWarning>
+      <body className="min-h-screen bg-background text-foreground antialiased font-sans">
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem
+          disableTransitionOnChange={false}
         >
-          Skip to main content
-        </a>
-        <ErrorBoundary>
-          <Navbar />
-          <main id="main-content" className="relative">
-            {children}
-          </main>
-        </ErrorBoundary>
+          <a
+            href="#main-content"
+            className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-cinema-orange focus:text-white focus:rounded"
+          >
+            Skip to main content
+          </a>
+          <ErrorBoundary>
+            <Navbar />
+            <main id="main-content" className="relative">
+              {children}
+            </main>
+          </ErrorBoundary>
+        </ThemeProvider>
       </body>
     </html>
   );

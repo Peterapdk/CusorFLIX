@@ -10,10 +10,10 @@ export default function WatchError({
   reset: () => void;
 }) {
   return (
-    <div className="min-h-screen bg-cinema-black flex items-center justify-center px-6">
+    <div className="min-h-screen bg-background flex items-center justify-center px-6">
       <div className="text-center space-y-6 max-w-md">
         <div className="space-y-2">
-          <h1 className="text-3xl font-bold text-white">Failed to load player</h1>
+          <h1 className="text-3xl font-bold text-foreground">Failed to load player</h1>
           <p className="text-cinema-white-dim text-lg">
             {error.message || 'Something went wrong while loading the video player'}
           </p>
