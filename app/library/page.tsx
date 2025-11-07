@@ -6,6 +6,8 @@ import { getOrCreateDemoUser } from '@/lib/auth';
 import logger from '@/lib/logger';
 import type { TMDBMovieDetails, TMDBTVShowDetails } from '@/types/tmdb';
 
+// Force dynamic rendering for user-specific data that changes with user interactions
+// Users need to see their latest watchlist and custom list changes immediately
 export const dynamic = 'force-dynamic';
 
 async function getLibraryItems(userId: string) {

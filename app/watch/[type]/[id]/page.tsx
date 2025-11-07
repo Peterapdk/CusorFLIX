@@ -1,8 +1,28 @@
-import PlayerFrame from '@/components/PlayerFrame';
-import AdBlockerStatus from '@/components/AdBlockerStatus';
-import CinemaOSDebug from '@/components/CinemaOSDebug';
+import dynamic from 'next/dynamic';
+
+// Dynamic imports for better code splitting and performance
+const PlayerFrame = dynamic(() => import('@/components/PlayerFrame'), {
+  ssr: false,
+  loading: () => (
+    <div className="h-full w-full bg-cinema-black flex items-center justify-center">
+      <div className="text-cinema-white-dim">Loading player...</div>
+    </div>
+  ),
+});
+
+const AdBlockerStatus = dynamic(() => import('@/components/AdBlockerStatus'), {
+  ssr: false,
+});
+
+// Only load debug component in development
+const CinemaOSDebug = process.env.NODE_ENV === 'development' 
+  ? dynamic(() => import('@/components/CinemaOSDebug'), { ssr: false })
+  : () => null;
 
 const CINEMAOS_BASE = 'https://cinemaos.tech';
+
+// Enable ISR caching for 1 hour - player URLs don't change frequently
+export const revalidate = 3600;
 
 export default async function WatchPage(props: { 
   params: Promise<{ type: string; id: string; season?: string; episode?: string }>;

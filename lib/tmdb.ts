@@ -20,6 +20,25 @@ interface TMDBError extends Error {
   responseText?: string;
 }
 
+// Retry configuration
+const MAX_RETRIES = 3;
+const INITIAL_RETRY_DELAY = 1000; // 1 second
+
+// Determine if an error is retryable
+function isRetryableError(error: TMDBError | Error): boolean {
+  if ('status' in error && error.status) {
+    // Retry on rate limiting and server errors
+    return error.status === 429 || (error.status >= 500 && error.status < 600);
+  }
+  // Retry on network errors (no status code)
+  return true;
+}
+
+// Sleep utility for retry delays
+function sleep(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 function buildHeaders(): HeadersInit {
   const headers: HeadersInit = { 'Content-Type': 'application/json' };
   if (TMDB_READ_ACCESS_TOKEN) {
@@ -46,31 +65,59 @@ async function tmdbFetch<T>(path: string, init?: { method?: HttpMethod; body?: u
     url.searchParams.set('api_key', TMDB_API_KEY);
   }
 
-  try {
-    const res = await fetch(url.toString(), {
-      method,
-      headers: buildHeaders(),
-      body: body ? JSON.stringify(body) : undefined,
-      next: { revalidate: 3600 } // Cache for 1 hour
-    });
+  // Retry loop with exponential backoff
+  let lastError: TMDBError | Error | null = null;
+  
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      const res = await fetch(url.toString(), {
+        method,
+        headers: buildHeaders(),
+        body: body ? JSON.stringify(body) : undefined,
+        next: { revalidate: 3600 } // Cache for 1 hour
+      });
 
-    if (!res.ok) {
-      const text = await res.text().catch(() => '');
-      const error: TMDBError = new Error(`TMDB ${method} ${url.pathname} failed: ${res.status} ${res.statusText}`);
-      error.status = res.status;
-      error.responseText = text;
-      throw error;
-    }
+      if (!res.ok) {
+        const text = await res.text().catch(() => '');
+        const error: TMDBError = new Error(`TMDB ${method} ${url.pathname} failed: ${res.status} ${res.statusText}`);
+        error.status = res.status;
+        error.responseText = text;
+        throw error;
+      }
 
-    return res.json() as Promise<T>;
-  } catch (error) {
-    // Re-throw if it's already our error
-    if (error instanceof Error && 'status' in error) {
-      throw error;
+      return res.json() as Promise<T>;
+    } catch (error) {
+      // Determine the actual error
+      let tmdbError: TMDBError | Error;
+      if (error instanceof Error && 'status' in error) {
+        tmdbError = error;
+      } else {
+        tmdbError = new Error(`TMDB request failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      }
+      
+      lastError = tmdbError;
+      
+      // Check if we should retry
+      const shouldRetry = attempt < MAX_RETRIES && isRetryableError(tmdbError);
+      
+      if (!shouldRetry) {
+        throw tmdbError;
+      }
+      
+      // Calculate exponential backoff delay
+      const delay = INITIAL_RETRY_DELAY * Math.pow(2, attempt);
+      
+      // Log retry attempt in development
+      if (process.env.NODE_ENV === 'development') {
+        console.warn(`TMDB API retry attempt ${attempt + 1}/${MAX_RETRIES} after ${delay}ms for ${url.pathname}`);
+      }
+      
+      await sleep(delay);
     }
-    // Otherwise, wrap network/parsing errors
-    throw new Error(`TMDB request failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
+  
+  // This shouldn't be reached, but TypeScript needs it
+  throw lastError || new Error('TMDB request failed after retries');
 }
 
 export type MediaType = TMDBMediaType;
