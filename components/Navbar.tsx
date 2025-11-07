@@ -24,7 +24,7 @@ export default function Navbar() {
             {/* Logo */}
             <Link href="/" className="flex items-center space-x-2 group">
               <div className="w-8 h-8 bg-gradient-to-br from-cinema-orange to-cinema-red rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">C</span>
+                <span className="text-primary-foreground font-bold text-sm">C</span>
               </div>
               <span className="text-xl font-bold text-foreground group-hover:text-cinema-orange transition-colors">
                 CinemaRebel

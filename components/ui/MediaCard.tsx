@@ -49,7 +49,7 @@ export default memo(function MediaCard({
     <div className="group relative card-hover">
       {/* Ranking Number */}
       {showRanking && rank && (
-        <div className="absolute -top-2 -left-2 z-20 w-8 h-8 bg-cinema-orange text-white font-bold text-sm rounded-full flex items-center justify-center">
+        <div className="absolute -top-2 -left-2 z-20 w-8 h-8 bg-primary text-primary-foreground font-bold text-sm rounded-full flex items-center justify-center">
           {rank}
         </div>
       )}

@@ -12,7 +12,8 @@ export function useTheme() {
   }, [])
 
   const toggleTheme = () => {
-    setTheme(theme === "dark" ? "light" : "dark")
+    const current = resolvedTheme || systemTheme || "dark"
+    setTheme(current === "dark" ? "light" : "dark")
   }
 
   const currentTheme = resolvedTheme || systemTheme || "dark"
