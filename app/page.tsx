@@ -1,101 +1,106 @@
+import { Suspense } from 'react';
 import { getTrending } from '@/lib/tmdb';
 import HeroSection from '@/components/ui/HeroSection';
 import ContentCarousel from '@/components/ui/ContentCarousel';
+import HeroSkeleton from '@/components/ui/HeroSkeleton';
+import CarouselSkeleton from '@/components/ui/CarouselSkeleton';
 import logger from '@/lib/logger';
 import type { TMDBMovie, TMDBTVShow } from '@/types/tmdb';
 import { isMovie, isTVShow } from '@/types/tmdb';
 
-export const dynamic = 'force-dynamic';
+// Removed force-dynamic to enable proper caching with revalidation
 export const revalidate = 3600; // Revalidate every hour
 
-async function getTrendingData() {
-  try {
-    const [movies, tv] = await Promise.all([
-      getTrending('movie', 'week').catch((error) => {
-        logger.error('Error fetching trending movies', { context: 'HomePage', error: error instanceof Error ? error : new Error(String(error)) });
-        return { results: [] };
-      }),
-      getTrending('tv', 'week').catch((error) => {
-        logger.error('Error fetching trending TV', { context: 'HomePage', error: error instanceof Error ? error : new Error(String(error)) });
-        return { results: [] };
-      }),
-    ]);
-
-    return { movies, tv };
-  } catch (error) {
-    logger.error('Error fetching trending data', { context: 'HomePage', error: error instanceof Error ? error : new Error(String(error)) });
-    return {
-      movies: { results: [] },
-      tv: { results: [] },
-    };
-  }
-}
-
-export default async function HomePage() {
-  const { movies, tv } = await getTrendingData();
-
-  // Add media_type to results for better component handling
+// Async component for hero section
+async function HeroContent() {
+  const movies = await getTrending('movie', 'week').catch((error) => {
+    logger.error('Error loading hero content', { context: 'HomePage', error: error instanceof Error ? error : new Error(String(error)) });
+    return { results: [] };
+  });
+  
   const moviesWithType = movies.results
     .filter(isMovie)
     .map((movie) => ({ ...movie, media_type: 'movie' as const })) as Array<TMDBMovie & { media_type: 'movie' }>;
+  
+  if (moviesWithType.length === 0) return null;
+  return <HeroSection featuredContent={moviesWithType[0]} />;
+}
+
+// Async component for trending movies
+async function TrendingMovies() {
+  const movies = await getTrending('movie', 'week').catch((error) => {
+    logger.error('Error loading trending movies', { context: 'HomePage', error: error instanceof Error ? error : new Error(String(error)) });
+    return { results: [] };
+  });
+  
+  const moviesWithType = movies.results
+    .filter(isMovie)
+    .map((movie) => ({ ...movie, media_type: 'movie' as const })) as Array<TMDBMovie & { media_type: 'movie' }>;
+  
+  if (moviesWithType.length === 0) return null;
+  
+  return (
+    <>
+      <ContentCarousel
+        title="Top 10 Movies"
+        items={moviesWithType.slice(0, 10)}
+        showRanking={true}
+      />
+      <ContentCarousel
+        title="Trending Movies"
+        items={moviesWithType}
+        showRanking={false}
+      />
+    </>
+  );
+}
+
+// Async component for trending TV shows
+async function TrendingTVShows() {
+  const tv = await getTrending('tv', 'week').catch((error) => {
+    logger.error('Error loading trending TV shows', { context: 'HomePage', error: error instanceof Error ? error : new Error(String(error)) });
+    return { results: [] };
+  });
+  
   const tvWithType = tv.results
     .filter(isTVShow)
     .map((show) => ({ ...show, media_type: 'tv' as const })) as Array<TMDBTVShow & { media_type: 'tv' }>;
+  
+  if (tvWithType.length === 0) return null;
+  
+  return (
+    <>
+      <ContentCarousel
+        title="Top 10 Shows"
+        items={tvWithType.slice(0, 10)}
+        showRanking={true}
+      />
+      <ContentCarousel
+        title="Trending TV"
+        items={tvWithType}
+        showRanking={false}
+      />
+    </>
+  );
+}
 
+export default function HomePage() {
   return (
     <main className="min-h-screen bg-cinema-black">
-      {/* Hero Section */}
-      <HeroSection featuredContent={moviesWithType[0]} />
+      {/* Hero Section with Suspense */}
+      <Suspense fallback={<HeroSkeleton />}>
+        <HeroContent />
+      </Suspense>
 
-      {/* Content Sections */}
+      {/* Content Sections with Suspense */}
       <div className="relative z-10 -mt-32 space-y-8">
-        {/* Top 10 Movies */}
-        {moviesWithType.length > 0 && (
-          <ContentCarousel
-            title="Top 10 Movies"
-            items={moviesWithType.slice(0, 10)}
-            showRanking={true}
-          />
-        )}
+        <Suspense fallback={<><CarouselSkeleton /><CarouselSkeleton /></>}>
+          <TrendingMovies />
+        </Suspense>
 
-        {/* Top 10 TV Shows */}
-        {tvWithType.length > 0 && (
-          <ContentCarousel
-            title="Top 10 Shows"
-            items={tvWithType.slice(0, 10)}
-            showRanking={true}
-          />
-        )}
-
-        {/* Trending Movies */}
-        {moviesWithType.length > 0 && (
-          <ContentCarousel
-            title="Trending Movies"
-            items={moviesWithType}
-            showRanking={false}
-          />
-        )}
-
-        {/* Trending TV Shows */}
-        {tvWithType.length > 0 && (
-          <ContentCarousel
-            title="Trending TV"
-            items={tvWithType}
-            showRanking={false}
-          />
-        )}
-
-        {/* Empty State */}
-        {moviesWithType.length === 0 && tvWithType.length === 0 && (
-          <div className="container mx-auto px-6 py-16">
-            <div className="text-center space-y-4">
-              <h2 className="text-2xl font-semibold text-white">Unable to load content</h2>
-              <p className="text-cinema-white-dim">
-                Please check your TMDB API configuration
-              </p>
-            </div>
-          </div>
-        )}
+        <Suspense fallback={<><CarouselSkeleton /><CarouselSkeleton /></>}>
+          <TrendingTVShows />
+        </Suspense>
       </div>
     </main>
   );

@@ -55,7 +55,7 @@ export default memo(function MediaCard({
       )}
 
       {/* Main Card */}
-      <Link href={`/${mediaType}/${item.id}`} className="block">
+      <Link href={`/${mediaType}/${item.id}`} className="block" prefetch={true}>
         <div className={`${sizeClasses[size]} relative overflow-hidden rounded-lg bg-cinema-gray-dark`}>
           {/* Poster Image */}
           {item.poster_path ? (
@@ -64,8 +64,9 @@ export default memo(function MediaCard({
               alt={`${title} poster`}
               fill
               className="object-cover transition-transform duration-300 group-hover:scale-110"
-              sizes={size === 'small' ? '128px' : size === 'medium' ? '160px' : '192px'}
+              sizes="(max-width: 640px) 128px, (max-width: 1024px) 160px, 192px"
               loading="lazy"
+              quality={80}
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-cinema-white-dim">
