@@ -76,16 +76,16 @@ export default async function LibraryPage() {
   
   if (!userId) {
     return (
-      <main className="min-h-screen bg-cinema-black pt-24 px-6">
+      <main className="min-h-screen bg-background pt-24 px-6">
         <div className="container mx-auto max-w-4xl">
           <div className="text-center space-y-6 py-16">
-            <div className="w-24 h-24 bg-cinema-gray-dark rounded-full flex items-center justify-center mx-auto">
-              <svg className="w-12 h-12 text-cinema-white-dim" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-24 h-24 bg-card rounded-full flex items-center justify-center mx-auto">
+              <svg className="w-12 h-12 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <h1 className="text-3xl font-bold text-white">Database Connection Issue</h1>
-            <p className="text-cinema-white-dim max-w-md mx-auto">
+            <h1 className="text-3xl font-bold text-foreground">Database Connection Issue</h1>
+            <p className="text-muted-foreground max-w-md mx-auto">
               Unable to connect to the database. Please check your DATABASE_URL configuration.
             </p>
             <Link href="/" className="btn-primary mt-6">
@@ -100,24 +100,24 @@ export default async function LibraryPage() {
   const lists = await getLibraryItems(userId);
 
   return (
-    <main className="min-h-screen bg-cinema-black pt-24 px-6">
+    <main className="min-h-screen bg-background pt-24 px-6">
       <div className="container mx-auto max-w-6xl space-y-8">
         {/* Header */}
         <div className="space-y-4">
-          <h1 className="text-section font-bold text-white">My Library</h1>
-          <p className="text-cinema-white-dim">Your watchlists and custom collections</p>
+          <h1 className="text-section font-bold text-foreground">My Library</h1>
+          <p className="text-muted-foreground">Your watchlists and custom collections</p>
         </div>
 
         {/* Library Content */}
         {lists.length === 0 ? (
           <div className="text-center py-16 space-y-6">
-            <div className="w-24 h-24 bg-cinema-gray-dark rounded-full flex items-center justify-center mx-auto">
-              <svg className="w-12 h-12 text-cinema-white-dim" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-24 h-24 bg-card rounded-full flex items-center justify-center mx-auto">
+              <svg className="w-12 h-12 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
               </svg>
             </div>
-            <h3 className="text-2xl font-semibold text-white">Your library is empty</h3>
-            <p className="text-cinema-white-dim max-w-md mx-auto">
+            <h3 className="text-2xl font-semibold text-foreground">Your library is empty</h3>
+            <p className="text-muted-foreground max-w-md mx-auto">
               Start building your collection by adding movies and TV shows to your watchlist!
             </p>
             <Link href="/search" className="btn-primary">
@@ -135,8 +135,8 @@ export default async function LibraryPage() {
                     {/* List Header */}
                     <div className="flex items-center justify-between">
                       <div>
-                        <h2 className="text-2xl font-semibold text-white">{list.name}</h2>
-                        <p className="text-cinema-white-dim capitalize">{list.type} • {list.items.length} items</p>
+                        <h2 className="text-2xl font-semibold text-foreground">{list.name}</h2>
+                        <p className="text-muted-foreground capitalize">{list.type} • {list.items.length} items</p>
                       </div>
                       {list.type === 'watchlist' && (
                         <div className="flex items-center space-x-2 text-cinema-orange">
@@ -151,7 +151,7 @@ export default async function LibraryPage() {
                     {/* List Content */}
                     {enrichedItems.length === 0 ? (
                       <div className="text-center py-8">
-                        <p className="text-cinema-white-dim">No items in this list</p>
+                        <p className="text-muted-foreground">No items in this list</p>
                       </div>
                     ) : (
                       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">

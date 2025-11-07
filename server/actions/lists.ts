@@ -57,3 +57,18 @@ export async function toggleWatchlist(userId: string, mediaType: MediaType, tmdb
     throw new Error('Failed to toggle watchlist');
   }
 }
+
+export async function toggleWatchlistWithAuth(mediaType: MediaType, tmdbId: number) {
+  try {
+    const { getOrCreateDemoUser } = await import('@/lib/auth');
+    const userId = await getOrCreateDemoUser();
+    if (!userId) {
+      return { error: 'Please log in to manage your watchlist', inWatchlist: null } as const;
+    }
+    const result = await toggleWatchlist(userId, mediaType, tmdbId);
+    return result;
+  } catch (error) {
+    logger.error('Error toggling watchlist with auth', { context: 'ServerActions', error: error instanceof Error ? error : new Error(String(error)) });
+    return { error: 'Failed to update watchlist', inWatchlist: null } as const;
+  }
+}

@@ -1,15 +1,44 @@
 import { searchMulti } from '@/lib/tmdb';
 import Link from 'next/link';
-import MediaCard from '@/components/ui/MediaCard';
+import MediaCardWithWatchlist from '@/components/ui/MediaCardWithWatchlist';
 import type { TMDBMediaItem, TMDBMovie, TMDBTVShow, TMDBPerson } from '@/types/tmdb';
 import { isMovie, isTVShow } from '@/types/tmdb';
+import logger from '@/lib/logger';
+import { getOrCreateDemoUser } from '@/lib/auth';
+import { prisma } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
+
+async function getWatchlistIds(userId: string | null): Promise<number[]> {
+  if (!userId) return [];
+  try {
+    const watchlist = await prisma.list.findFirst({ where: { userId, type: 'watchlist' } });
+    if (!watchlist) return [];
+    const items = await prisma.listItem.findMany({ where: { listId: watchlist.id } });
+    return items.map(item => item.tmdbId);
+  } catch (error) {
+    logger.error('Error fetching watchlist IDs', { 
+      context: 'SearchPage', 
+      error: error instanceof Error ? error : new Error(String(error))
+    });
+    return [];
+  }
+}
 
 export default async function SearchPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
   const params = await searchParams;
   const q = params.q?.trim() || '';
-  const data = q ? await searchMulti(q, 1).catch(() => ({ results: [] as TMDBMediaItem[] })) : { results: [] as TMDBMediaItem[] };
+  const userId = await getOrCreateDemoUser();
+  const watchlistIds = await getWatchlistIds(userId);
+  
+  const data = q ? await searchMulti(q, 1).catch((error) => {
+    logger.error('Error searching TMDB', { 
+      context: 'SearchPage', 
+      query: q,
+      error: error instanceof Error ? error : new Error(String(error))
+    });
+    return { results: [] as TMDBMediaItem[] };
+  }) : { results: [] as TMDBMediaItem[] };
 
   // Filter out person results and organize by media type
   const movieResults = data.results?.filter((item): item is TMDBMovie => isMovie(item)) || [];
@@ -22,7 +51,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
         {/* Header */}
         <div className="text-center space-y-4">
           <h1 className="text-section font-bold text-foreground">Search</h1>
-          <p className="text-cinema-white-dim">Discover movies and TV shows</p>
+          <p className="text-muted-foreground">Discover movies and TV shows</p>
         </div>
 
         {/* Search Form */}
@@ -38,7 +67,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
               />
               <button
                 type="submit"
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 p-2 text-cinema-white-dim hover:text-cinema-orange transition-colors"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 p-2 text-muted-foreground hover:text-cinema-orange transition-colors"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -53,15 +82,15 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
           <div className="space-y-8">
             {/* Results Summary */}
             <div className="text-center">
-              <p className="text-cinema-white-muted">
+              <p className="text-muted-foreground">
                 {data.results?.length ? (
                   <>
                     Found <span className="text-cinema-orange font-semibold">{data.results.length}</span> results for{" "}
-                    <span className="text-white font-semibold">&quot;{q}&quot;</span>
+                    <span className="text-foreground font-semibold">&quot;{q}&quot;</span>
                   </>
                 ) : (
                   <>
-                    No results found for <span className="text-white font-semibold">&quot;{q}&quot;</span>
+                    No results found for <span className="text-foreground font-semibold">&quot;{q}&quot;</span>
                   </>
                 )}
               </p>
@@ -75,7 +104,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
                 </h2>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
                   {movieResults.map((item) => (
-                    <MediaCard
+                    <MediaCardWithWatchlist
                       key={`movie-${item.id}`}
                       item={{
                         ...item,
@@ -83,6 +112,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
                         media_type: 'movie'
                       }}
                       size="medium"
+                      initialInWatchlist={watchlistIds.includes(item.id)}
                     />
                   ))}
                 </div>
@@ -97,7 +127,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
                 </h2>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
                   {tvResults.map((item) => (
-                    <MediaCard
+                    <MediaCardWithWatchlist
                       key={`tv-${item.id}`}
                       item={{
                         ...item,
@@ -105,6 +135,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
                         media_type: 'tv'
                       }}
                       size="medium"
+                      initialInWatchlist={watchlistIds.includes(item.id)}
                     />
                   ))}
                 </div>
@@ -127,7 +158,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
                       </div>
                       <div>
                         <h3 className="text-foreground font-medium">{item.name}</h3>
-                        <p className="text-cinema-white-dim text-sm capitalize">{item.media_type || 'person'}</p>
+                        <p className="text-muted-foreground text-sm capitalize">{item.media_type || 'person'}</p>
                       </div>
                     </div>
                   ))}
@@ -144,7 +175,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
                   </svg>
                 </div>
                 <h3 className="text-xl font-semibold text-foreground">No results found</h3>
-                <p className="text-cinema-white-dim max-w-md mx-auto">
+                <p className="text-muted-foreground max-w-md mx-auto">
                   Try searching for something else or check your spelling. You can also browse our trending content below.
                 </p>
                 <Link href="/" className="btn-primary mt-6">
@@ -163,8 +194,8 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </div>
-            <h3 className="text-xl font-semibold text-foreground">Search for Movies & TV Shows</h3>
-            <p className="text-cinema-white-dim max-w-md mx-auto">
+                <h3 className="text-xl font-semibold text-foreground">Search for Movies & TV Shows</h3>
+                <p className="text-muted-foreground max-w-md mx-auto">
               Find your next favorite movie or TV show. Search by title, actor, or genre.
             </p>
           </div>
