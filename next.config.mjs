@@ -28,7 +28,7 @@ const nextConfig = {
             value: [
               "default-src 'self'",
               "img-src 'self' https://image.tmdb.org data:",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+              "script-src 'self' 'unsafe-inline'",
               "style-src 'self' 'unsafe-inline'",
               "frame-src https://cinemaos.tech",
               "frame-ancestors 'self'",

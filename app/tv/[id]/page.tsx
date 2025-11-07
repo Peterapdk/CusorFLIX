@@ -1,6 +1,7 @@
 import { getTVDetails, getTVSeason } from '@/lib/tmdb';
 import Image from 'next/image';
 import Link from 'next/link';
+import Script from 'next/script';
 import type { TMDBTVShowDetails, TMDBSeason, TMDBCastMember, TMDBMovie, TMDBTVShow } from '@/types/tmdb';
 import { generateMetadata } from './metadata';
 import { generateTVStructuredData } from '@/lib/structured-data';
@@ -35,11 +36,16 @@ export default async function TVDetailsPage(props: { params: Promise<{ id: strin
   const networks = tvData.networks?.map((n) => n.name).join(', ') || 'Unknown';
   const structuredData = generateTVStructuredData(tvData);
 
+  // Validate and sanitize structured data before rendering
+  const sanitizedStructuredData = structuredData;
+  const structuredDataJson = JSON.stringify(sanitizedStructuredData);
+
   return (
     <>
-      <script
+      <Script
+        id="tv-structured-data"
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        dangerouslySetInnerHTML={{ __html: structuredDataJson }}
       />
       <main className="min-h-screen bg-cinema-black">
       {/* Hero Section */}

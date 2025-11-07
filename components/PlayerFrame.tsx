@@ -127,7 +127,12 @@ export default function PlayerFrame({ src, className }: PlayerFrameProps) {
               };
               localStorage.setItem(STORAGE_KEY, JSON.stringify(watchProgress));
             }
-          } catch {}
+          } catch (error) {
+            logger.error('Failed to save watch progress to localStorage', {
+              context: 'PlayerFrame',
+              error: error instanceof Error ? error : new Error(String(error))
+            });
+          }
         }
       }
     };

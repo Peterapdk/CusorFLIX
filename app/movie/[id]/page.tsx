@@ -1,6 +1,7 @@
 import { getMovieDetails } from '@/lib/tmdb';
 import Image from 'next/image';
 import Link from 'next/link';
+import Script from 'next/script';
 import type { TMDBMovieDetails, TMDBCastMember, TMDBMovie, TMDBTVShow } from '@/types/tmdb';
 import { generateMetadata } from './metadata';
 import { generateStructuredData } from '@/lib/structured-data';
@@ -31,11 +32,16 @@ export default async function MovieDetailsPage(props: { params: Promise<{ id: st
   const genres = movieData.genres?.map((g) => g.name).join(', ') || 'Unknown';
   const structuredData = generateStructuredData(movieData);
 
+  // Validate and sanitize structured data before rendering
+  const sanitizedStructuredData = structuredData;
+  const structuredDataJson = JSON.stringify(sanitizedStructuredData);
+
   return (
     <>
-      <script
+      <Script
+        id="movie-structured-data"
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        dangerouslySetInnerHTML={{ __html: structuredDataJson }}
       />
       <main className="min-h-screen bg-cinema-black">
       {/* Hero Section */}

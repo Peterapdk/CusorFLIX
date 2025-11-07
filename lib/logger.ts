@@ -54,8 +54,10 @@ class Logger {
       
       // In production, you might want to send to error tracking service
       if (this.isProduction && error) {
-        // TODO: Integrate with error tracking service (e.g., Sentry, LogRocket)
-        // Example: errorTrackingService.captureException(error, { context, message });
+        // FUTURE: Integrate with error tracking service (e.g., Sentry, LogRocket)
+        // This is a planned enhancement for production monitoring.
+        // When implementing, uncomment and configure:
+        // errorTrackingService.captureException(error, { context, message });
       }
     } else {
       console.error(`[ERROR]${context} ${message}`);

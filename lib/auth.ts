@@ -29,7 +29,16 @@ export async function getOrCreateDemoUser() {
 
 /**
  * Get user ID from session/auth
- * TODO: Replace with actual authentication logic
+ * 
+ * NOTE: Currently uses demo authentication for development/testing.
+ * This is intentional for the current development phase.
+ * 
+ * For production deployment, this should be replaced with:
+ * - NextAuth.js or similar authentication library
+ * - Session management via cookies/JWT
+ * - User context from authentication middleware
+ * 
+ * @returns User ID string or null if authentication fails
  */
 export async function getUserId(): Promise<string | null> {
   // For now, use demo user

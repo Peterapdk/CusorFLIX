@@ -6,6 +6,7 @@ import type {
   TMDBSeasonDetails,
   MediaType as TMDBMediaType
 } from '@/types/tmdb';
+import logger from '@/lib/logger';
 
 const TMDB_BASE_URL = process.env.NEXT_PUBLIC_TMDB_BASE_URL || 'https://api.themoviedb.org/3';
 const TMDB_V4_BASE_URL = process.env.NEXT_PUBLIC_TMDB_V4_BASE_URL || 'https://api.themoviedb.org/4';
@@ -107,10 +108,11 @@ async function tmdbFetch<T>(path: string, init?: { method?: HttpMethod; body?: u
       // Calculate exponential backoff delay
       const delay = INITIAL_RETRY_DELAY * Math.pow(2, attempt);
       
-      // Log retry attempt in development
-      if (process.env.NODE_ENV === 'development') {
-        console.warn(`TMDB API retry attempt ${attempt + 1}/${MAX_RETRIES} after ${delay}ms for ${url.pathname}`);
-      }
+      // Log retry attempt
+      logger.warn(`TMDB API retry attempt ${attempt + 1}/${MAX_RETRIES} after ${delay}ms`, {
+        context: 'TMDB',
+        path: url.pathname
+      });
       
       await sleep(delay);
     }
