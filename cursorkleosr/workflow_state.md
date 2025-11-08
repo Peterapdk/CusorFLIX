@@ -80,8 +80,8 @@ graph LR
 
 <!-- DYNAMIC:STATE:START -->
 ## State
-Phase:COMPLETED Status:SUCCESS Item:discovery_page_with_tabs_and_filters Confidence:9 Files:app/discovery/*,lib/tmdb.ts Modules:frontend Checkpoint:discovery_page_complete                                                                              
-Last Updated: 2025-01-28 (Discovery page with Movies/TV Shows tabs, genre filtering, and sorting implementation completed, validation passed)                                                                               
+Phase:COMPLETED Status:SUCCESS Item:enhanced_discovery_page_with_dual_range_slider_and_major_languages Confidence:9 Files:app/discovery/*,app/api/discover/route.ts,lib/tmdb.ts,lib/tmdb-languages.ts,types/library.ts Modules:frontend,backend Checkpoint:enhanced_discovery_complete                                                                              
+Last Updated: 2025-01-28 (Enhanced Discovery page with dual range year slider, major languages filter, fixed sidebar filters, and dynamic API-based filtering completed. API route updated to support year ranges and languages. All validation passed.)                                                                               
 <!-- DYNAMIC:STATE:END -->
 
 ## Plan
@@ -150,16 +150,20 @@ Last Updated: 2025-01-28 (Discovery page with Movies/TV Shows tabs, genre filter
 | 26 | Re-enable Custom Lists with CustomListsSection component | completed | 2 | 9 | 100% | app/library/components/CustomListsSection.tsx,app/library/LibraryPageClient.tsx | frontend |
 | 27 | Create Discovery page with Movies/TV Shows tabs | completed | 3 | 9 | 100% | app/discovery/page.tsx,app/discovery/DiscoveryPageClient.tsx,app/discovery/components/DiscoverySection.tsx,lib/tmdb.ts | frontend |
 | 28 | Add TMDB discover API functions | completed | 2 | 9 | 100% | lib/tmdb.ts | backend |
+| 29 | Implement dual range year slider with tooltips | completed | 3 | 9 | 100% | app/discovery/components/YearRangeSlider.tsx | frontend |
+| 30 | Replace regions with major languages filter | completed | 2 | 9 | 100% | lib/tmdb-languages.ts,app/discovery/components/FiltersPanel.tsx,app/api/discover/route.ts | frontend,backend |
+| 31 | Implement fixed sidebar filters layout | completed | 2 | 9 | 100% | app/discovery/components/FiltersPanel.tsx,app/discovery/components/DiscoverySection.tsx | frontend |
+| 32 | Update API route for year range and languages | completed | 2 | 9 | 100% | app/api/discover/route.ts | backend |
 <!-- DYNAMIC:ITEMS:END -->
 
 ## Metrics
-Tasks: 28/28  
+Tasks: 32/32  
 Success: 100%  
 **Quality**: lint_errors:0 type_errors:0 test_failures:0 coverage:null%
 **Performance**: build_time_ms:success test_time_ms:null
-**Diff**: files_changed:64 loc_added:6800 loc_removed:450
+**Diff**: files_changed:70 loc_added:7200 loc_removed:600
 **Analysis**: issues_found:6 issues_fixed:5 issues_documented:1 security_issues:0_remaining type_safety:0_remaining error_handling:0_remaining completion:100%
-**Features**: theming_system:completed frontend_optimization:completed tv_seasons:completed database_fixes:completed build_config:completed library_redesign:completed filter_sort_ui:completed custom_lists:completed discovery_page:completed
+**Features**: theming_system:completed frontend_optimization:completed tv_seasons:completed database_fixes:completed build_config:completed library_redesign:completed filter_sort_ui:completed custom_lists:completed discovery_page:completed enhanced_discovery:completed dual_range_slider:completed major_languages:completed sidebar_filters:completed
 <!-- DYNAMIC:METRICS:END -->
 
 ## Checkpoints
@@ -609,6 +613,66 @@ Success: 100%
     "Watchlist integration with MediaCardWithWatchlist",
     "Empty states for filtered results",
     "Client-side filtering and sorting using library-utils"
+  ],
+  "validation": {
+    "lint": "PASS (0 errors)",
+    "typecheck": "PASS (0 errors)"
+  }
+},
+{
+  "timestamp": "2025-01-28",
+  "action": "enhanced_discovery_page_implementation",
+  "phase": "COMPLETED",
+  "status": "SUCCESS",
+  "details": "Completed Enhanced Discovery page implementation: dual range year slider, major languages filter, fixed sidebar filters, dynamic API-based filtering",
+  "files_created": [
+    "app/discovery/components/YearRangeSlider.tsx",
+    "app/discovery/components/StarRatingFilter.tsx",
+    "app/discovery/components/SortPanel.tsx",
+    "app/discovery/components/FiltersPanel.tsx",
+    "lib/tmdb-languages.ts",
+    "app/api/discover/route.ts"
+  ],
+  "files_modified": [
+    "lib/tmdb.ts",
+    "types/library.ts",
+    "app/discovery/components/DiscoverySection.tsx",
+    "app/discovery/components/CollectionsSection.tsx",
+    "app/discovery/page.tsx",
+    "lib/library-utils.ts"
+  ],
+  "features_implemented": [
+    "Dual range year slider (1970 to current year) with tooltips and connected range",
+    "Major languages filter (22 European + Asian + Middle Eastern languages) with multi-select",
+    "Fixed sidebar filters on desktop, collapsible drawer on mobile",
+    "Dynamic API-based filtering with debouncing (500ms)",
+    "Infinite scroll pagination with Intersection Observer",
+    "Year range support (single year and date ranges) in API route",
+    "Language filtering (multi-select, uses first/preferred language)",
+    "Star rating filter (4+, 6+, 8+)",
+    "Sort panel with dropdown UI",
+    "Loading states (initial load vs. pagination)",
+    "Error handling and empty states"
+  ],
+  "validation": {
+    "lint": "PASS (0 errors)",
+    "typecheck": "PASS (0 errors)"
+  }
+},
+{
+  "timestamp": "2025-01-28",
+  "action": "fix_api_route_languages_and_year_range",
+  "phase": "COMPLETED",
+  "status": "SUCCESS",
+  "details": "Fixed API route to remove regions reference, use languages only, and support year range filtering",
+  "files_modified": [
+    "app/api/discover/route.ts"
+  ],
+  "fixes_applied": [
+    "Removed getLanguageCodesForRegions import and usage",
+    "Updated to use languages array directly from filters",
+    "Added year range support (single year and date ranges)",
+    "Improved language preference logic (prefers common languages)"
   ],
   "validation": {
     "lint": "PASS (0 errors)",

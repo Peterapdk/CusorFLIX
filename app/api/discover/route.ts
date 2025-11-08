@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { discoverMovies, discoverTVShows } from '@/lib/tmdb';
 import { isMovie, isTVShow } from '@/types/tmdb';
 import type { MediaFilter, SortOption } from '@/types/library';
-import { getLanguageCodesForRegions } from '@/lib/tmdb-languages';
 import logger from '@/lib/logger';
 
 // Force dynamic rendering - no caching for discovery results
@@ -44,26 +43,16 @@ function convertFiltersToDiscoverOptions(
     options.with_genres = filters.genres.join(',');
   }
 
-  // Regions: Convert region IDs to language codes
-  // Since TMDB only supports single language, we'll use the first language code
-  // or combine multiple regions' languages (TMDB will use OR logic with multiple calls)
-  if (filters.regions && filters.regions.length > 0) {
-    const languageCodes = getLanguageCodesForRegions(filters.regions);
-    // TMDB API only accepts single language, so we use the first one
-    // For better results with multiple regions, we could make multiple API calls
-    // For now, we'll use the most common language or first language
-    if (languageCodes.length > 0) {
-      // Prefer English, Spanish, or Chinese as they're most common
-      const preferredLanguages = ['en', 'es', 'zh', 'ja', 'fr', 'de'];
-      const preferred = languageCodes.find(lang => preferredLanguages.includes(lang));
-      options.with_original_language = preferred || languageCodes[0];
-    }
-  }
-
-  // Languages: Direct language codes (if provided, takes precedence over regions)
+  // Languages: Direct language codes (multi-select)
+  // Note: TMDB API only supports single language per request
+  // If multiple languages selected, we use the first one
+  // TODO: Could make multiple API calls and merge results for better multi-language support
   if (filters.languages && filters.languages.length > 0) {
     // TMDB only supports single language, use first one
-    options.with_original_language = filters.languages[0];
+    // Prefer common languages if available
+    const preferredLanguages = ['en', 'es', 'fr', 'de', 'it', 'pt', 'ja', 'ko', 'zh'];
+    const preferred = filters.languages.find(lang => preferredLanguages.includes(lang));
+    options.with_original_language = preferred || filters.languages[0];
   }
 
   // Minimum rating (for star buttons: 4, 6, or 8)
@@ -71,12 +60,42 @@ function convertFiltersToDiscoverOptions(
     options['vote_average.gte'] = filters.minRating;
   }
 
-  // Year: Single year filter (use year parameter for better performance)
-  if (filters.yearRange?.min !== undefined) {
-    if (isMovieType) {
-      options.primary_release_year = filters.yearRange.min;
+  // Year range: Convert to date range or single year
+  if (filters.yearRange) {
+    const { min, max } = filters.yearRange;
+    const currentYear = new Date().getFullYear();
+    const MIN_YEAR = 1970;
+    
+    if (min !== undefined && max !== undefined && min === max) {
+      // Single year: use year parameter for better performance
+      if (isMovieType) {
+        options.primary_release_year = min;
+      } else {
+        options.first_air_date_year = min;
+      }
     } else {
-      options.first_air_date_year = filters.yearRange.min;
+      // Year range: use date parameters
+      if (min !== undefined && min !== MIN_YEAR) {
+        if (isMovieType) {
+          options['primary_release_date.gte'] = `${min}-01-01`;
+        } else {
+          options['first_air_date.gte'] = `${min}-01-01`;
+        }
+      }
+      if (max !== undefined && max < currentYear) {
+        if (isMovieType) {
+          options['primary_release_date.lte'] = `${max}-12-31`;
+        } else {
+          options['first_air_date.lte'] = `${max}-12-31`;
+        }
+      } else if (max === undefined && min !== undefined) {
+        // If only min is set, set max to current year
+        if (isMovieType) {
+          options['primary_release_date.lte'] = `${currentYear}-12-31`;
+        } else {
+          options['first_air_date.lte'] = `${currentYear}-12-31`;
+        }
+      }
     }
   }
 
