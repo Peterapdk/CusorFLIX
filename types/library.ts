@@ -9,7 +9,8 @@ export type MediaFilter = {
   tags?: string[]; // Custom tags (future feature)
   yearRange?: { min?: number; max?: number };
   ratingRange?: { min?: number; max?: number };
-  language?: string; // ISO 639-1 language code (e.g., 'en', 'es', 'fr')
+  languages?: string[]; // ISO 639-1 language codes (multi-select) (e.g., ['en', 'es', 'fr'])
+  regions?: string[]; // Region IDs (multi-select) (e.g., ['north-america', 'europe-central-asia'])
   minRating?: number; // Minimum rating for star buttons (4, 6, or 8)
 };
 

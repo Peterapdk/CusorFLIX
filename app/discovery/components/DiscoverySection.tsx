@@ -258,7 +258,7 @@ export default function DiscoverySection({
           <h2 className="text-2xl font-semibold text-foreground">Discovery</h2>
           {activeTab !== 'collections' && (
             <p className="text-muted-foreground">
-              {isLoading ? 'Loading...' : error ? error : `${totalResults} ${totalResults === 1 ? 'item' : 'items'}`}
+              {isLoading ? 'Loading...' : error ? error : totalResults > 100 ? '100+ items' : `${totalResults} ${totalResults === 1 ? 'item' : 'items'}`}
             </p>
           )}
         </div>
@@ -281,7 +281,7 @@ export default function DiscoverySection({
                 ? 'bg-primary text-primary-foreground'
                 : 'bg-muted text-muted-foreground'
             }`}>
-              {totalResults}
+              {totalResults > 100 ? '100+' : totalResults}
             </span>
           )}
           {activeTab === 'movies' && (
@@ -303,7 +303,7 @@ export default function DiscoverySection({
                 ? 'bg-primary text-primary-foreground'
                 : 'bg-muted text-muted-foreground'
             }`}>
-              {totalResults}
+              {totalResults > 100 ? '100+' : totalResults}
             </span>
           )}
           {activeTab === 'tv' && (

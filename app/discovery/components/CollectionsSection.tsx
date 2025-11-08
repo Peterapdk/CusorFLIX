@@ -166,14 +166,17 @@ export default function CollectionsSection({
   }
 
   const hasActiveFilters = Object.keys(filters).length > 0 && 
-    (filters.genres?.length || filters.yearRange || filters.minRating || filters.language);
+    (filters.genres?.length || filters.yearRange?.min || filters.minRating || filters.regions?.length);
 
   return (
     <div className="space-y-12">
       {hasActiveFilters && (
         <div className="bg-secondary/50 border border-border rounded-lg p-4">
           <p className="text-sm text-muted-foreground">
-            Showing filtered results from collections. {processedCollections.reduce((sum, c) => sum + c.filteredCount, 0)} items match your filters.
+            Showing filtered results from collections. {(() => {
+              const count = processedCollections.reduce((sum, c) => sum + c.filteredCount, 0);
+              return count > 100 ? '100+' : count;
+            })()} items match your filters.
           </p>
         </div>
       )}

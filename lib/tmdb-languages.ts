@@ -1,49 +1,79 @@
 /**
- * TMDB Language Constants
- * Common languages for filtering content by original language
- * Uses ISO 639-1 language codes as required by TMDB API
+ * TMDB Region Constants
+ * Regions for filtering content by original language
+ * Maps regions to ISO 639-1 language codes as required by TMDB API
  */
 
-export interface TMDBLanguage {
-  code: string; // ISO 639-1 code
-  name: string; // Display name
+export interface Region {
+  id: string;
+  name: string;
+  languageCodes: string[]; // ISO 639-1 codes for languages in this region
 }
 
-export const COMMON_LANGUAGES: TMDBLanguage[] = [
-  { code: 'en', name: 'English' },
-  { code: 'es', name: 'Spanish' },
-  { code: 'fr', name: 'French' },
-  { code: 'de', name: 'German' },
-  { code: 'it', name: 'Italian' },
-  { code: 'pt', name: 'Portuguese' },
-  { code: 'ja', name: 'Japanese' },
-  { code: 'ko', name: 'Korean' },
-  { code: 'zh', name: 'Chinese' },
-  { code: 'hi', name: 'Hindi' },
-  { code: 'ru', name: 'Russian' },
-  { code: 'ar', name: 'Arabic' },
-  { code: 'tr', name: 'Turkish' },
-  { code: 'pl', name: 'Polish' },
-  { code: 'nl', name: 'Dutch' },
-  { code: 'sv', name: 'Swedish' },
-  { code: 'da', name: 'Danish' },
-  { code: 'fi', name: 'Finnish' },
-  { code: 'no', name: 'Norwegian' },
-  { code: 'th', name: 'Thai' },
+export const REGIONS: Region[] = [
+  {
+    id: 'east-asia-pacific',
+    name: 'East Asia and Pacific',
+    languageCodes: ['ja', 'ko', 'zh', 'th', 'vi', 'id', 'ms', 'tl', 'my', 'km', 'lo', 'mn', 'ka', 'hy', 'az', 'uz', 'kk', 'ky', 'tg', 'tk']
+  },
+  {
+    id: 'europe-central-asia',
+    name: 'Europe and Central Asia',
+    languageCodes: ['en', 'fr', 'de', 'it', 'es', 'pt', 'ru', 'pl', 'nl', 'sv', 'da', 'fi', 'no', 'cs', 'sk', 'hu', 'ro', 'bg', 'hr', 'sr', 'sl', 'mk', 'sq', 'et', 'lv', 'lt', 'el', 'tr', 'ka', 'hy', 'az', 'kk', 'ky', 'uz', 'tg', 'tk']
+  },
+  {
+    id: 'latin-america-caribbean',
+    name: 'Latin America and Caribbean',
+    languageCodes: ['es', 'pt', 'fr', 'en', 'ht', 'qu', 'ay', 'gn', 'nl']
+  },
+  {
+    id: 'middle-east-north-africa',
+    name: 'Middle East, North Africa, Afghanistan and Pakistan',
+    languageCodes: ['ar', 'fa', 'ur', 'he', 'tr', 'ps', 'ku', 'az', 'am', 'tk', 'uz', 'tg', 'ky', 'kk']
+  },
+  {
+    id: 'north-america',
+    name: 'North America',
+    languageCodes: ['en', 'es', 'fr']
+  },
+  {
+    id: 'south-asia',
+    name: 'South Asia',
+    languageCodes: ['hi', 'bn', 'ur', 'te', 'ta', 'mr', 'gu', 'kn', 'or', 'pa', 'ml', 'si', 'ne', 'my', 'dz', 'th']
+  },
 ];
 
 /**
- * Get language name by code
+ * Get region by ID
  */
-export function getLanguageName(code: string): string | undefined {
-  const language = COMMON_LANGUAGES.find(lang => lang.code === code);
-  return language?.name;
+export function getRegionById(id: string): Region | undefined {
+  return REGIONS.find(region => region.id === id);
 }
 
 /**
- * Get all language codes
+ * Get language codes for a region
  */
-export function getAllLanguageCodes(): string[] {
-  return COMMON_LANGUAGES.map(lang => lang.code);
+export function getLanguageCodesForRegion(regionId: string): string[] {
+  const region = getRegionById(regionId);
+  return region?.languageCodes || [];
+}
+
+/**
+ * Get all region IDs
+ */
+export function getAllRegionIds(): string[] {
+  return REGIONS.map(region => region.id);
+}
+
+/**
+ * Get language codes for multiple regions
+ */
+export function getLanguageCodesForRegions(regionIds: string[]): string[] {
+  const allCodes = new Set<string>();
+  regionIds.forEach(regionId => {
+    const codes = getLanguageCodesForRegion(regionId);
+    codes.forEach(code => allCodes.add(code));
+  });
+  return Array.from(allCodes);
 }
 

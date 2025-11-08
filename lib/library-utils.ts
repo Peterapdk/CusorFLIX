@@ -27,25 +27,28 @@ export function filterItems<T extends EnrichedLibraryItem>(
     });
   }
 
-  // Filter by year range
-  if (filter.yearRange) {
+  // Filter by year (single year filter)
+  if (filter.yearRange?.min !== undefined) {
     filtered = filtered.filter(item => {
       const dateStr = item.release_date || item.first_air_date;
       if (!dateStr) return false;
       const year = parseInt(dateStr.split('-')[0], 10);
       if (isNaN(year)) return false;
       
-      if (filter.yearRange!.min !== undefined && year < filter.yearRange!.min) {
-        return false;
-      }
-      if (filter.yearRange!.max !== undefined && year > filter.yearRange!.max) {
-        return false;
-      }
-      return true;
+      // Filter for items released in the specified year
+      return year === filter.yearRange!.min;
     });
   }
 
-  // Filter by rating range
+  // Filter by minimum rating
+  if (filter.minRating !== undefined) {
+    filtered = filtered.filter(item => {
+      const rating = item.vote_average || 0;
+      return rating >= filter.minRating!;
+    });
+  }
+
+  // Filter by rating range (if both min and max are provided)
   if (filter.ratingRange) {
     filtered = filtered.filter(item => {
       const rating = item.vote_average || 0;
