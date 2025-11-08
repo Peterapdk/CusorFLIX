@@ -80,8 +80,8 @@ graph LR
 
 <!-- DYNAMIC:STATE:START -->
 ## State
-Phase:COMPLETED Status:SUCCESS Item:library_redesign_watchlist_categorization Confidence:9 Files:app/library/*,types/library.ts,lib/library-utils.ts Modules:frontend Checkpoint:library_redesign_complete                                                                              
-Last Updated: 2025-01-28 (Library redesign completed: watchlist categorization with tabs, filter/sort foundation created, validation passed)                                                                               
+Phase:COMPLETED Status:SUCCESS Item:filter_sort_ui_and_custom_lists Confidence:9 Files:app/library/components/*,app/library/LibraryPageClient.tsx,lib/tmdb-genres.ts Modules:frontend Checkpoint:filter_sort_ui_and_custom_lists_complete                                                                              
+Last Updated: 2025-01-28 (Filter/Sort UI and Custom Lists implementation completed, validation passed)                                                                               
 <!-- DYNAMIC:STATE:END -->
 
 ## Plan
@@ -145,16 +145,18 @@ Last Updated: 2025-01-28 (Library redesign completed: watchlist categorization w
 | 22 | Update .gitignore with TypeScript build artifacts | completed | 1 | 10 | 100% | .gitignore | config |
 | 23 | Library redesign: watchlist categorization with Movies/TV Shows tabs | completed | 2 | 9 | 100% | app/library/page.tsx,app/library/LibraryPageClient.tsx,app/library/components/WatchlistSection.tsx | frontend |
 | 24 | Create filter/sort foundation (types and utilities) | completed | 2 | 9 | 100% | types/library.ts,lib/library-utils.ts | frontend |
+| 25 | Implement Filter/Sort UI with FilterSortBar component | completed | 3 | 9 | 100% | app/library/components/FilterSortBar.tsx,app/library/components/WatchlistSection.tsx,lib/tmdb-genres.ts | frontend |
+| 26 | Re-enable Custom Lists with CustomListsSection component | completed | 2 | 9 | 100% | app/library/components/CustomListsSection.tsx,app/library/LibraryPageClient.tsx | frontend |
 <!-- DYNAMIC:ITEMS:END -->
 
 ## Metrics
-Tasks: 24/24  
+Tasks: 26/26  
 Success: 100%  
 **Quality**: lint_errors:0 type_errors:0 test_failures:0 coverage:null%
 **Performance**: build_time_ms:success test_time_ms:null
-**Diff**: files_changed:54 loc_added:4850 loc_removed:380
+**Diff**: files_changed:60 loc_added:6200 loc_removed:450
 **Analysis**: issues_found:6 issues_fixed:5 issues_documented:1 security_issues:0_remaining type_safety:0_remaining error_handling:0_remaining completion:100%
-**Features**: theming_system:completed frontend_optimization:completed tv_seasons:completed database_fixes:completed build_config:completed library_redesign:completed
+**Features**: theming_system:completed frontend_optimization:completed tv_seasons:completed database_fixes:completed build_config:completed library_redesign:completed filter_sort_ui:completed custom_lists:completed
 <!-- DYNAMIC:METRICS:END -->
 
 ## Checkpoints
@@ -173,7 +175,9 @@ Success: 100%
 | 2025-11-05 | IMPLEMENT | 9 | true | security_enhancements - CSP headers and Vidora X-Frame handling (420e0cf, 3a41a01) |
 | 2025-11-07 | COMPLETED | 10 | true | scan_complete - All undocumented changes identified and workflow_state.md updated |
 | 2025-01-28 | IMPLEMENT | 9 | true | library_redesign_complete - Watchlist categorization with tabs, filter/sort foundation |
-| 2025-01-28 | COMPLETED | 9 | true | library_redesign_validated - Lint and typecheck passed, ready for use |
+| 2025-01-28 | COMPLETED | 9 | true | library_redesign_validated - Lint and typecheck passed, pushed to GitHub (10cd305) |
+| 2025-01-28 | IMPLEMENT | 9 | true | filter_sort_ui_complete - FilterSortBar component and WatchlistSection integration |
+| 2025-01-28 | IMPLEMENT | 9 | true | custom_lists_complete - CustomListsSection component and LibraryPageClient integration |
 <!-- DYNAMIC:CHECKPOINTS:END -->
 
 ## Log
@@ -546,6 +550,35 @@ Success: 100%
     "lint": "PASS (0 errors)",
     "typecheck": "PASS (0 errors)"
   }
+},
+{
+  "timestamp": "2025-01-28",
+  "action": "filter_sort_ui_and_custom_lists_implementation",
+  "phase": "COMPLETED",
+  "status": "SUCCESS",
+  "details": "Completed Filter/Sort UI and re-enabled Custom Lists: FilterSortBar component, WatchlistSection integration, CustomListsSection component, TMDB genre constants",
+  "files_created": [
+    "app/library/components/FilterSortBar.tsx",
+    "app/library/components/CustomListsSection.tsx",
+    "lib/tmdb-genres.ts"
+  ],
+  "files_modified": [
+    "app/library/components/WatchlistSection.tsx",
+    "app/library/LibraryPageClient.tsx"
+  ],
+  "features_implemented": [
+    "FilterSortBar component with genre, year, and rating filters",
+    "Sort options (date-added, release-date, rating, title, popularity)",
+    "Filter/sort integration with WatchlistSection",
+    "CustomListsSection component with create/edit/delete functionality",
+    "TMDB genre constants for movies and TV shows",
+    "Collapsible filter panel with active filter indicators",
+    "Empty states for filtered results"
+  ],
+  "validation": {
+    "lint": "PASS (0 errors)",
+    "typecheck": "PASS (0 errors)"
+  }
 }
 ```
 <!-- DYNAMIC:LOG:END -->
@@ -575,6 +608,7 @@ Success: 100%
 | acbeeaf | fix(db): add composite unique on ListItem (listId, tmdbId) to support upsert selector | 2025-11-05 |
 | 051173e | docs(env): add ENV_EXAMPLE for Vercel env configuration | 2025-11-05 |
 | 420e0cf | chore(security): add CSP headers for Vidora iframe and TMDB assets | 2025-11-05 |
+| 10cd305 | feat: implement library redesign with watchlist categorization and filter/sort foundation | 2025-01-28 |
 <!-- DYNAMIC:WORKFLOW_HISTORY:END -->
 
 <!-- DYNAMIC:ARCHIVE_LOG:START -->

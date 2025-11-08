@@ -1,8 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import MediaCardWithRemove from '@/components/ui/MediaCardWithRemove';
-import type { EnrichedLibraryItem } from '@/types/library';
+import FilterSortBar from './FilterSortBar';
+import type { EnrichedLibraryItem, MediaFilter, SortOption, SortDirection } from '@/types/library';
+import { filterItems, sortItems } from '@/lib/library-utils';
 
 interface WatchlistSectionProps {
   movies: EnrichedLibraryItem[];
@@ -18,8 +20,49 @@ export default function WatchlistSection({
   onWatchlistToggle
 }: WatchlistSectionProps) {
   const [activeTab, setActiveTab] = useState<TabType>('movies');
+  const [filters, setFilters] = useState<MediaFilter>({});
+  const [sortOption, setSortOption] = useState<SortOption>('date-added');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
+
+  // Get current media type for filter bar
+  const currentMediaType = activeTab === 'movies' ? 'movie' : 'tv';
+
+  // Apply filters and sorting to current tab's items
+  const displayedItems = useMemo(() => {
+    const items = activeTab === 'movies' ? movies : tvShows;
+    
+    // Apply media type filter (should match current tab)
+    const mediaTypeFilter: MediaFilter = {
+      ...filters,
+      mediaType: currentMediaType,
+    };
+    
+    // Filter items
+    const filtered = filterItems(items, mediaTypeFilter);
+    
+    // Sort items
+    const sorted = sortItems(filtered, sortOption, sortDirection);
+    
+    return sorted;
+  }, [movies, tvShows, activeTab, filters, sortOption, sortDirection, currentMediaType]);
 
   const totalCount = movies.length + tvShows.length;
+  const filteredCount = displayedItems.length;
+
+  const handleFilterChange = (newFilters: MediaFilter) => {
+    setFilters(newFilters);
+  };
+
+  const handleSortChange = (option: SortOption, direction: SortDirection) => {
+    setSortOption(option);
+    setSortDirection(direction);
+  };
+
+  const handleClearFilters = () => {
+    setFilters({});
+    setSortOption('date-added');
+    setSortDirection('desc');
+  };
 
   if (totalCount === 0) {
     return (
@@ -51,7 +94,11 @@ export default function WatchlistSection({
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-semibold text-foreground">Watchlist</h2>
-          <p className="text-muted-foreground">{totalCount} {totalCount === 1 ? 'item' : 'items'}</p>
+          <p className="text-muted-foreground">
+            {filteredCount === (activeTab === 'movies' ? movies.length : tvShows.length)
+              ? `${totalCount} ${totalCount === 1 ? 'item' : 'items'}`
+              : `${filteredCount} of ${activeTab === 'movies' ? movies.length : tvShows.length} ${activeTab === 'movies' ? 'movies' : 'TV shows'}`}
+          </p>
         </div>
         <div className="flex items-center space-x-2 text-cinema-orange">
           <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -109,6 +156,17 @@ export default function WatchlistSection({
         </button>
       </div>
 
+      {/* Filter/Sort Bar */}
+      <FilterSortBar
+        filters={filters}
+        sortOption={sortOption}
+        sortDirection={sortDirection}
+        mediaType={currentMediaType}
+        onFilterChange={handleFilterChange}
+        onSortChange={handleSortChange}
+        onClearFilters={handleClearFilters}
+      />
+
       {/* Content */}
       <div className="mt-6">
         {activeTab === 'movies' && (
@@ -123,9 +181,25 @@ export default function WatchlistSection({
                 <h3 className="text-lg font-semibold text-foreground mb-2">No movies in your watchlist yet</h3>
                 <p className="text-muted-foreground">Start adding movies to your watchlist to see them here!</p>
               </div>
+            ) : displayedItems.length === 0 ? (
+              <div className="text-center py-16">
+                <div className="w-20 h-20 bg-card rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-10 h-10 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-semibold text-foreground mb-2">No results found</h3>
+                <p className="text-muted-foreground">Try adjusting your filters to see more results.</p>
+                <button
+                  onClick={handleClearFilters}
+                  className="mt-4 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+                >
+                  Clear Filters
+                </button>
+              </div>
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
-                {movies.map((item) => (
+                {displayedItems.map((item) => (
                   <MediaCardWithRemove
                     key={`movie-${item.id}-${item.listItemId}`}
                     item={item}
@@ -152,9 +226,25 @@ export default function WatchlistSection({
                 <h3 className="text-lg font-semibold text-foreground mb-2">No TV shows in your watchlist yet</h3>
                 <p className="text-muted-foreground">Start adding TV shows to your watchlist to see them here!</p>
               </div>
+            ) : displayedItems.length === 0 ? (
+              <div className="text-center py-16">
+                <div className="w-20 h-20 bg-card rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-10 h-10 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-semibold text-foreground mb-2">No results found</h3>
+                <p className="text-muted-foreground">Try adjusting your filters to see more results.</p>
+                <button
+                  onClick={handleClearFilters}
+                  className="mt-4 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+                >
+                  Clear Filters
+                </button>
+              </div>
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
-                {tvShows.map((item) => (
+                {displayedItems.map((item) => (
                   <MediaCardWithRemove
                     key={`tv-${item.id}-${item.listItemId}`}
                     item={item}
