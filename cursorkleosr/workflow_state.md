@@ -80,8 +80,8 @@ graph LR
 
 <!-- DYNAMIC:STATE:START -->
 ## State
-Phase:COMPLETED Status:SUCCESS Item:project_consolidation_and_cleanup Confidence:10 Files:.gitignore,components/ui/*.tsx,cursorkleosr/workflow_state.md,README.md Modules:frontend,backend,config Checkpoint:project_consolidation_complete                                                                              
-Last Updated: 2025-01-28 (project consolidation: updated .gitignore, replaced console statements with logger, updated documentation)                                                                               
+Phase:COMPLETED Status:SUCCESS Item:library_redesign_watchlist_categorization Confidence:9 Files:app/library/*,types/library.ts,lib/library-utils.ts Modules:frontend Checkpoint:library_redesign_complete                                                                              
+Last Updated: 2025-01-28 (Library redesign completed: watchlist categorization with tabs, filter/sort foundation created, validation passed)                                                                               
 <!-- DYNAMIC:STATE:END -->
 
 ## Plan
@@ -143,16 +143,18 @@ Last Updated: 2025-01-28 (project consolidation: updated .gitignore, replaced co
 | 20 | Project consolidation and cleanup | completed | 2 | 10 | 100% | .gitignore,components/ui/*.tsx,README.md,cursorkleosr/workflow_state.md | config,frontend |
 | 21 | Replace console statements with logger in client components | completed | 1 | 10 | 100% | components/ui/MediaCardWithRemove.tsx,components/ui/MediaCardWithWatchlist.tsx,components/ui/ContentCarouselWithWatchlist.tsx,components/ui/WatchlistButton.tsx | frontend |
 | 22 | Update .gitignore with TypeScript build artifacts | completed | 1 | 10 | 100% | .gitignore | config |
+| 23 | Library redesign: watchlist categorization with Movies/TV Shows tabs | completed | 2 | 9 | 100% | app/library/page.tsx,app/library/LibraryPageClient.tsx,app/library/components/WatchlistSection.tsx | frontend |
+| 24 | Create filter/sort foundation (types and utilities) | completed | 2 | 9 | 100% | types/library.ts,lib/library-utils.ts | frontend |
 <!-- DYNAMIC:ITEMS:END -->
 
 ## Metrics
-Tasks: 22/22  
+Tasks: 24/24  
 Success: 100%  
 **Quality**: lint_errors:0 type_errors:0 test_failures:0 coverage:null%
 **Performance**: build_time_ms:success test_time_ms:null
-**Diff**: files_changed:49 loc_added:4286 loc_removed:329
+**Diff**: files_changed:54 loc_added:4850 loc_removed:380
 **Analysis**: issues_found:6 issues_fixed:5 issues_documented:1 security_issues:0_remaining type_safety:0_remaining error_handling:0_remaining completion:100%
-**Features**: theming_system:completed frontend_optimization:completed tv_seasons:completed database_fixes:completed build_config:completed
+**Features**: theming_system:completed frontend_optimization:completed tv_seasons:completed database_fixes:completed build_config:completed library_redesign:completed
 <!-- DYNAMIC:METRICS:END -->
 
 ## Checkpoints
@@ -170,6 +172,8 @@ Success: 100%
 | 2025-11-06 | IMPLEMENT | 9 | true | database_fixes - Unique constraints and Prisma config (69a6576, acbeeaf, 511386b) |
 | 2025-11-05 | IMPLEMENT | 9 | true | security_enhancements - CSP headers and Vidora X-Frame handling (420e0cf, 3a41a01) |
 | 2025-11-07 | COMPLETED | 10 | true | scan_complete - All undocumented changes identified and workflow_state.md updated |
+| 2025-01-28 | IMPLEMENT | 9 | true | library_redesign_complete - Watchlist categorization with tabs, filter/sort foundation |
+| 2025-01-28 | COMPLETED | 9 | true | library_redesign_validated - Lint and typecheck passed, ready for use |
 <!-- DYNAMIC:CHECKPOINTS:END -->
 
 ## Log
@@ -510,6 +514,33 @@ Success: 100%
     "Updated workflow_state.md with consolidation work",
     "Created CLEANUP_PLAN.md for future cleanup tasks",
     "Created docs/DOCUMENTATION_STATUS.md for documentation review"
+  ],
+  "validation": {
+    "lint": "PASS (0 errors)",
+    "typecheck": "PASS (0 errors)"
+  }
+},
+{
+  "timestamp": "2025-01-28",
+  "action": "library_redesign_implementation",
+  "phase": "COMPLETED",
+  "status": "SUCCESS",
+  "details": "Completed library redesign: watchlist categorization with Movies/TV Shows tabs, filter/sort foundation created",
+  "files_created": [
+    "types/library.ts",
+    "lib/library-utils.ts",
+    "app/library/components/WatchlistSection.tsx"
+  ],
+  "files_modified": [
+    "app/library/page.tsx",
+    "app/library/LibraryPageClient.tsx"
+  ],
+  "features_implemented": [
+    "Watchlist categorized by Movies and TV Shows with tab interface",
+    "Filter/sort foundation with types and utility functions",
+    "Server-side categorization and parallel enrichment",
+    "Custom lists hidden for now (prepared for future)",
+    "Empty states for empty watchlist categories"
   ],
   "validation": {
     "lint": "PASS (0 errors)",

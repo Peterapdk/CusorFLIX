@@ -3,6 +3,7 @@ import { getMovieDetails, getTVDetails } from '@/lib/tmdb';
 import { getOrCreateDemoUser } from '@/lib/auth';
 import logger from '@/lib/logger';
 import type { TMDBMovieDetails, TMDBTVShowDetails } from '@/types/tmdb';
+import type { EnrichedLibraryItem } from '@/types/library';
 import LibraryPageClient from './LibraryPageClient';
 import Link from 'next/link';
 
@@ -29,7 +30,7 @@ async function getLibraryItems(userId: string) {
   }
 }
 
-async function enrichItems(items: Array<{ id: string; mediaType: string; tmdbId: number }>) {
+async function enrichItems(items: Array<{ id: string; mediaType: string; tmdbId: number; createdAt: Date }>) {
   const enriched = await Promise.allSettled(
     items.map(async (item) => {
       try {
@@ -42,7 +43,9 @@ async function enrichItems(items: Array<{ id: string; mediaType: string; tmdbId:
             release_date: details.release_date,
             poster_path: details.poster_path || null,
             vote_average: details.vote_average || 0,
+            genre_ids: details.genre_ids || [],
             media_type: 'movie' as const,
+            addedAt: item.createdAt,
           };
         } else {
           const details = await getTVDetails(item.tmdbId.toString()) as TMDBTVShowDetails;
@@ -53,7 +56,9 @@ async function enrichItems(items: Array<{ id: string; mediaType: string; tmdbId:
             first_air_date: details.first_air_date,
             poster_path: details.poster_path || null,
             vote_average: details.vote_average || 0,
+            genre_ids: details.genre_ids || [],
             media_type: 'tv' as const,
+            addedAt: item.createdAt,
           };
         }
       } catch (error) {
@@ -68,9 +73,11 @@ async function enrichItems(items: Array<{ id: string; mediaType: string; tmdbId:
     })
   );
 
-  return enriched
+  const results = enriched
     .map((result) => (result.status === 'fulfilled' ? result.value : null))
-    .filter((item): item is NonNullable<typeof item> => item !== null);
+    .filter((item) => item !== null);
+  
+  return results as EnrichedLibraryItem[];
 }
 
 export default async function LibraryPage() {
@@ -101,16 +108,38 @@ export default async function LibraryPage() {
 
   const lists = await getLibraryItems(userId);
   
-  // Enrich items for all lists on the server
-  const enrichedLists = await Promise.all(
-    lists.map(async (list) => {
+  // Separate watchlist from custom lists
+  const watchlist = lists.find(list => list.type === 'watchlist');
+  const customLists = lists.filter(list => list.type === 'custom');
+  
+  // Group watchlist items by mediaType and enrich separately
+  const watchlistMovies = watchlist?.items.filter(item => item.mediaType === 'movie') || [];
+  const watchlistTVShows = watchlist?.items.filter(item => item.mediaType === 'tv') || [];
+  
+  // Enrich watchlist items in parallel
+  const [enrichedWatchlistMovies, enrichedWatchlistTVShows] = await Promise.all([
+    enrichItems(watchlistMovies),
+    enrichItems(watchlistTVShows),
+  ]);
+  
+  // Enrich custom lists (for future use, hidden for now)
+  // Type assertion needed since we've filtered to only custom lists
+  const enrichedCustomLists = await Promise.all(
+    customLists.map(async (list) => {
       const enriched = await enrichItems(list.items);
       return {
         ...list,
+        type: 'custom' as const,
         enrichedItems: enriched,
       };
     })
   );
 
-  return <LibraryPageClient lists={enrichedLists} />;
+  return (
+    <LibraryPageClient 
+      watchlistMovies={enrichedWatchlistMovies}
+      watchlistTVShows={enrichedWatchlistTVShows}
+      customLists={enrichedCustomLists}
+    />
+  );
 }
