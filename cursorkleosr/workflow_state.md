@@ -80,8 +80,8 @@ graph LR
 
 <!-- DYNAMIC:STATE:START -->
 ## State
-Phase:COMPLETED Status:SUCCESS Item:filter_sort_ui_and_custom_lists Confidence:9 Files:app/library/components/*,app/library/LibraryPageClient.tsx,lib/tmdb-genres.ts Modules:frontend Checkpoint:filter_sort_ui_and_custom_lists_complete                                                                              
-Last Updated: 2025-01-28 (Filter/Sort UI and Custom Lists implementation completed, validation passed)                                                                               
+Phase:COMPLETED Status:SUCCESS Item:discovery_page_with_tabs_and_filters Confidence:9 Files:app/discovery/*,lib/tmdb.ts Modules:frontend Checkpoint:discovery_page_complete                                                                              
+Last Updated: 2025-01-28 (Discovery page with Movies/TV Shows tabs, genre filtering, and sorting implementation completed, validation passed)                                                                               
 <!-- DYNAMIC:STATE:END -->
 
 ## Plan
@@ -117,6 +117,7 @@ Last Updated: 2025-01-28 (Filter/Sort UI and Custom Lists implementation complet
 30. ✅ Add ENV_EXAMPLE documentation
 31. ✅ Enhance CSP headers for Vidora iframe and TMDB assets
 32. ✅ Scan project for undocumented changes and update workflow_state.md
+33. ✅ Create Discovery page with Movies/TV Shows tabs, genre filtering, and sorting
 <!-- DYNAMIC:PLAN:END -->
 
 ## Items
@@ -147,16 +148,18 @@ Last Updated: 2025-01-28 (Filter/Sort UI and Custom Lists implementation complet
 | 24 | Create filter/sort foundation (types and utilities) | completed | 2 | 9 | 100% | types/library.ts,lib/library-utils.ts | frontend |
 | 25 | Implement Filter/Sort UI with FilterSortBar component | completed | 3 | 9 | 100% | app/library/components/FilterSortBar.tsx,app/library/components/WatchlistSection.tsx,lib/tmdb-genres.ts | frontend |
 | 26 | Re-enable Custom Lists with CustomListsSection component | completed | 2 | 9 | 100% | app/library/components/CustomListsSection.tsx,app/library/LibraryPageClient.tsx | frontend |
+| 27 | Create Discovery page with Movies/TV Shows tabs | completed | 3 | 9 | 100% | app/discovery/page.tsx,app/discovery/DiscoveryPageClient.tsx,app/discovery/components/DiscoverySection.tsx,lib/tmdb.ts | frontend |
+| 28 | Add TMDB discover API functions | completed | 2 | 9 | 100% | lib/tmdb.ts | backend |
 <!-- DYNAMIC:ITEMS:END -->
 
 ## Metrics
-Tasks: 26/26  
+Tasks: 28/28  
 Success: 100%  
 **Quality**: lint_errors:0 type_errors:0 test_failures:0 coverage:null%
 **Performance**: build_time_ms:success test_time_ms:null
-**Diff**: files_changed:60 loc_added:6200 loc_removed:450
+**Diff**: files_changed:64 loc_added:6800 loc_removed:450
 **Analysis**: issues_found:6 issues_fixed:5 issues_documented:1 security_issues:0_remaining type_safety:0_remaining error_handling:0_remaining completion:100%
-**Features**: theming_system:completed frontend_optimization:completed tv_seasons:completed database_fixes:completed build_config:completed library_redesign:completed filter_sort_ui:completed custom_lists:completed
+**Features**: theming_system:completed frontend_optimization:completed tv_seasons:completed database_fixes:completed build_config:completed library_redesign:completed filter_sort_ui:completed custom_lists:completed discovery_page:completed
 <!-- DYNAMIC:METRICS:END -->
 
 ## Checkpoints
@@ -178,6 +181,9 @@ Success: 100%
 | 2025-01-28 | COMPLETED | 9 | true | library_redesign_validated - Lint and typecheck passed, pushed to GitHub (10cd305) |
 | 2025-01-28 | IMPLEMENT | 9 | true | filter_sort_ui_complete - FilterSortBar component and WatchlistSection integration |
 | 2025-01-28 | IMPLEMENT | 9 | true | custom_lists_complete - CustomListsSection component and LibraryPageClient integration |
+| 2025-01-28 | COMPLETED | 9 | true | filter_sort_ui_and_custom_lists_validated - Lint and typecheck passed, pushed to GitHub (74a5e63) |
+| 2025-01-28 | IMPLEMENT | 9 | true | discovery_page_complete - Discovery page with Movies/TV Shows tabs, genre filtering, and sorting |
+| 2025-01-28 | COMPLETED | 9 | true | discovery_page_validated - Lint and typecheck passed, ready for testing |
 <!-- DYNAMIC:CHECKPOINTS:END -->
 
 ## Log
@@ -579,6 +585,35 @@ Success: 100%
     "lint": "PASS (0 errors)",
     "typecheck": "PASS (0 errors)"
   }
+},
+{
+  "timestamp": "2025-01-28",
+  "action": "discovery_page_implementation",
+  "phase": "COMPLETED",
+  "status": "SUCCESS",
+  "details": "Completed Discovery page implementation: Movies/TV Shows tabs, genre filtering, sorting, TMDB discover API integration",
+  "files_created": [
+    "app/discovery/page.tsx",
+    "app/discovery/DiscoveryPageClient.tsx",
+    "app/discovery/components/DiscoverySection.tsx"
+  ],
+  "files_modified": [
+    "lib/tmdb.ts"
+  ],
+  "features_implemented": [
+    "Discovery page with Movies and TV Shows tabs",
+    "Genre filtering using FilterSortBar component",
+    "Sorting by popularity, rating, release date, title",
+    "Year range and rating range filters",
+    "TMDB discover API integration (discoverMovies, discoverTVShows)",
+    "Watchlist integration with MediaCardWithWatchlist",
+    "Empty states for filtered results",
+    "Client-side filtering and sorting using library-utils"
+  ],
+  "validation": {
+    "lint": "PASS (0 errors)",
+    "typecheck": "PASS (0 errors)"
+  }
 }
 ```
 <!-- DYNAMIC:LOG:END -->
@@ -609,6 +644,8 @@ Success: 100%
 | 051173e | docs(env): add ENV_EXAMPLE for Vercel env configuration | 2025-11-05 |
 | 420e0cf | chore(security): add CSP headers for Vidora iframe and TMDB assets | 2025-11-05 |
 | 10cd305 | feat: implement library redesign with watchlist categorization and filter/sort foundation | 2025-01-28 |
+| 74a5e63 | feat: implement filter/sort UI and re-enable custom lists | 2025-01-28 |
+| TBD | feat: implement Discovery page with Movies/TV Shows tabs, genre filtering, and sorting | 2025-01-28 |
 <!-- DYNAMIC:WORKFLOW_HISTORY:END -->
 
 <!-- DYNAMIC:ARCHIVE_LOG:START -->

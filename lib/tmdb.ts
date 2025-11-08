@@ -144,12 +144,50 @@ export async function getTVSeason(id: string | number, seasonNumber: number): Pr
   return tmdbFetch<TMDBSeasonDetails>(`/tv/${id}/season/${seasonNumber}`, { query: { language: 'en-US' } });
 }
 
+export interface DiscoverMoviesOptions {
+  page?: number;
+  sort_by?: string;
+  with_genres?: string; // Comma-separated genre IDs
+  primary_release_year?: number;
+  'vote_average.gte'?: number;
+  'vote_average.lte'?: number;
+}
+
+export interface DiscoverTVOptions {
+  page?: number;
+  sort_by?: string;
+  with_genres?: string; // Comma-separated genre IDs
+  first_air_date_year?: number;
+  'vote_average.gte'?: number;
+  'vote_average.lte'?: number;
+}
+
+export async function discoverMovies(options: DiscoverMoviesOptions = {}): Promise<TMDBTrendingResponse> {
+  const query: Record<string, string | number | boolean | undefined> = {
+    language: 'en-US',
+    page: options.page || 1,
+    ...options,
+  };
+  return tmdbFetch<TMDBTrendingResponse>(`/discover/movie`, { query });
+}
+
+export async function discoverTVShows(options: DiscoverTVOptions = {}): Promise<TMDBTrendingResponse> {
+  const query: Record<string, string | number | boolean | undefined> = {
+    language: 'en-US',
+    page: options.page || 1,
+    ...options,
+  };
+  return tmdbFetch<TMDBTrendingResponse>(`/discover/tv`, { query });
+}
+
 export const tmdb = {
   getTrending,
   searchMulti,
   getMovieDetails,
   getTVDetails,
   getTVSeason,
+  discoverMovies,
+  discoverTVShows,
 };
 
 
