@@ -3,10 +3,10 @@
 import { useState } from 'react';
 import type { MediaFilter } from '@/types/library';
 import { getGenresByMediaType } from '@/lib/tmdb-genres';
-import { REGIONS } from '@/lib/tmdb-languages';
+import { MAJOR_LANGUAGES } from '@/lib/tmdb-languages';
 import type { TMDBGenre } from '@/lib/tmdb-genres';
 import StarRatingFilter from './StarRatingFilter';
-import YearSlider from './YearSlider';
+import YearRangeSlider from './YearRangeSlider';
 
 interface FiltersPanelProps {
   filters: MediaFilter;
@@ -27,15 +27,15 @@ export default function FiltersPanel({
 
   const hasActiveFilters =
     (filters.genres && filters.genres.length > 0) ||
-    filters.yearRange?.min !== undefined ||
+    (filters.yearRange && (filters.yearRange.min !== undefined || filters.yearRange.max !== undefined)) ||
     filters.minRating !== undefined ||
-    (filters.regions && filters.regions.length > 0);
+    (filters.languages && filters.languages.length > 0);
 
   const activeFilterCount =
     (filters.genres?.length || 0) +
     (filters.minRating ? 1 : 0) +
-    (filters.regions?.length || 0) +
-    (filters.yearRange?.min ? 1 : 0);
+    (filters.languages?.length || 0) +
+    (filters.yearRange?.min || filters.yearRange?.max ? 1 : 0);
 
   const handleGenreToggle = (genreId: number) => {
     const currentGenres = filters.genres || [];
@@ -48,14 +48,14 @@ export default function FiltersPanel({
     });
   };
 
-  const handleRegionToggle = (regionId: string) => {
-    const currentRegions = filters.regions || [];
-    const newRegions = currentRegions.includes(regionId)
-      ? currentRegions.filter((id) => id !== regionId)
-      : [...currentRegions, regionId];
+  const handleLanguageToggle = (languageCode: string) => {
+    const currentLanguages = filters.languages || [];
+    const newLanguages = currentLanguages.includes(languageCode)
+      ? currentLanguages.filter((code) => code !== languageCode)
+      : [...currentLanguages, languageCode];
     onFilterChange({
       ...filters,
-      regions: newRegions.length > 0 ? newRegions : undefined,
+      languages: newLanguages.length > 0 ? newLanguages : undefined,
     });
   };
 
@@ -66,14 +66,15 @@ export default function FiltersPanel({
     });
   };
 
-  const handleYearChange = (year: number | undefined) => {
+  const handleYearRangeChange = (min: number, max: number) => {
     const currentYear = new Date().getFullYear();
     const MIN_YEAR = 1970;
     
     onFilterChange({
       ...filters,
       yearRange: {
-        min: year && year !== currentYear ? year : undefined,
+        min: min !== MIN_YEAR ? min : undefined,
+        max: max !== currentYear ? max : undefined,
       },
     });
   };
@@ -182,26 +183,26 @@ export default function FiltersPanel({
 
       {isExpanded && (
         <div className="space-y-6">
-          {/* Region Filter */}
+          {/* Language Filter */}
           <div>
             <label className="block text-sm font-medium text-foreground mb-2">
-              Region
+              Language
             </label>
-            <div className="flex flex-col gap-2 max-h-48 overflow-y-auto">
-              {REGIONS.map((region) => {
-                const isSelected = filters.regions?.includes(region.id);
+            <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto">
+              {MAJOR_LANGUAGES.map((lang) => {
+                const isSelected = filters.languages?.includes(lang.code);
                 return (
                   <button
-                    key={region.id}
-                    onClick={() => handleRegionToggle(region.id)}
+                    key={lang.code}
+                    onClick={() => handleLanguageToggle(lang.code)}
                     type="button"
-                    className={`w-full text-left px-3 py-2 text-sm rounded-lg transition-colors ${
+                    className={`px-3 py-1.5 text-sm rounded-full transition-colors ${
                       isSelected
                         ? 'bg-primary text-primary-foreground'
                         : 'bg-secondary text-foreground hover:bg-secondary/80'
                     }`}
                   >
-                    {region.name}
+                    {lang.name}
                   </button>
                 );
               })}
@@ -240,10 +241,11 @@ export default function FiltersPanel({
             onRatingChange={handleRatingChange}
           />
 
-          {/* Year Slider */}
-          <YearSlider
-            year={filters.yearRange?.min}
-            onYearChange={handleYearChange}
+          {/* Year Range Slider */}
+          <YearRangeSlider
+            minYear={filters.yearRange?.min}
+            maxYear={filters.yearRange?.max}
+            onYearRangeChange={handleYearRangeChange}
           />
 
           {hasActiveFilters && (

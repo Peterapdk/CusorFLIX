@@ -1,79 +1,66 @@
 /**
- * TMDB Region Constants
- * Regions for filtering content by original language
- * Maps regions to ISO 639-1 language codes as required by TMDB API
+ * TMDB Language Constants
+ * Major languages for filtering content by original language
+ * Includes major European languages and other widely spoken languages
+ * Uses ISO 639-1 language codes as required by TMDB API
  */
 
-export interface Region {
-  id: string;
-  name: string;
-  languageCodes: string[]; // ISO 639-1 codes for languages in this region
+export interface TMDBLanguage {
+  code: string; // ISO 639-1 code
+  name: string; // Display name
 }
 
-export const REGIONS: Region[] = [
-  {
-    id: 'east-asia-pacific',
-    name: 'East Asia and Pacific',
-    languageCodes: ['ja', 'ko', 'zh', 'th', 'vi', 'id', 'ms', 'tl', 'my', 'km', 'lo', 'mn', 'ka', 'hy', 'az', 'uz', 'kk', 'ky', 'tg', 'tk']
-  },
-  {
-    id: 'europe-central-asia',
-    name: 'Europe and Central Asia',
-    languageCodes: ['en', 'fr', 'de', 'it', 'es', 'pt', 'ru', 'pl', 'nl', 'sv', 'da', 'fi', 'no', 'cs', 'sk', 'hu', 'ro', 'bg', 'hr', 'sr', 'sl', 'mk', 'sq', 'et', 'lv', 'lt', 'el', 'tr', 'ka', 'hy', 'az', 'kk', 'ky', 'uz', 'tg', 'tk']
-  },
-  {
-    id: 'latin-america-caribbean',
-    name: 'Latin America and Caribbean',
-    languageCodes: ['es', 'pt', 'fr', 'en', 'ht', 'qu', 'ay', 'gn', 'nl']
-  },
-  {
-    id: 'middle-east-north-africa',
-    name: 'Middle East, North Africa, Afghanistan and Pakistan',
-    languageCodes: ['ar', 'fa', 'ur', 'he', 'tr', 'ps', 'ku', 'az', 'am', 'tk', 'uz', 'tg', 'ky', 'kk']
-  },
-  {
-    id: 'north-america',
-    name: 'North America',
-    languageCodes: ['en', 'es', 'fr']
-  },
-  {
-    id: 'south-asia',
-    name: 'South Asia',
-    languageCodes: ['hi', 'bn', 'ur', 'te', 'ta', 'mr', 'gu', 'kn', 'or', 'pa', 'ml', 'si', 'ne', 'my', 'dz', 'th']
-  },
+export const MAJOR_LANGUAGES: TMDBLanguage[] = [
+  // European Languages
+  { code: 'en', name: 'English' },
+  { code: 'es', name: 'Spanish' },
+  { code: 'fr', name: 'French' },
+  { code: 'de', name: 'German' },
+  { code: 'it', name: 'Italian' },
+  { code: 'pt', name: 'Portuguese' },
+  { code: 'ru', name: 'Russian' },
+  { code: 'pl', name: 'Polish' },
+  { code: 'nl', name: 'Dutch' },
+  { code: 'sv', name: 'Swedish' },
+  { code: 'da', name: 'Danish' },
+  { code: 'fi', name: 'Finnish' },
+  { code: 'no', name: 'Norwegian' },
+  { code: 'cs', name: 'Czech' },
+  { code: 'hu', name: 'Hungarian' },
+  { code: 'ro', name: 'Romanian' },
+  { code: 'bg', name: 'Bulgarian' },
+  { code: 'hr', name: 'Croatian' },
+  { code: 'sk', name: 'Slovak' },
+  { code: 'sl', name: 'Slovenian' },
+  { code: 'el', name: 'Greek' },
+  { code: 'tr', name: 'Turkish' },
+  // Asian Languages
+  { code: 'ja', name: 'Japanese' },
+  { code: 'ko', name: 'Korean' },
+  { code: 'zh', name: 'Chinese' },
+  { code: 'hi', name: 'Hindi' },
+  { code: 'th', name: 'Thai' },
+  { code: 'vi', name: 'Vietnamese' },
+  { code: 'id', name: 'Indonesian' },
+  { code: 'ms', name: 'Malay' },
+  // Middle Eastern Languages
+  { code: 'ar', name: 'Arabic' },
+  { code: 'he', name: 'Hebrew' },
+  { code: 'fa', name: 'Persian' },
+  { code: 'ur', name: 'Urdu' },
 ];
 
 /**
- * Get region by ID
+ * Get language name by code
  */
-export function getRegionById(id: string): Region | undefined {
-  return REGIONS.find(region => region.id === id);
+export function getLanguageName(code: string): string | undefined {
+  const language = MAJOR_LANGUAGES.find(lang => lang.code === code);
+  return language?.name;
 }
 
 /**
- * Get language codes for a region
+ * Get all language codes
  */
-export function getLanguageCodesForRegion(regionId: string): string[] {
-  const region = getRegionById(regionId);
-  return region?.languageCodes || [];
+export function getAllLanguageCodes(): string[] {
+  return MAJOR_LANGUAGES.map(lang => lang.code);
 }
-
-/**
- * Get all region IDs
- */
-export function getAllRegionIds(): string[] {
-  return REGIONS.map(region => region.id);
-}
-
-/**
- * Get language codes for multiple regions
- */
-export function getLanguageCodesForRegions(regionIds: string[]): string[] {
-  const allCodes = new Set<string>();
-  regionIds.forEach(regionId => {
-    const codes = getLanguageCodesForRegion(regionId);
-    codes.forEach(code => allCodes.add(code));
-  });
-  return Array.from(allCodes);
-}
-
