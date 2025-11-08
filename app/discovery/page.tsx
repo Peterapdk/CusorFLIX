@@ -1,4 +1,4 @@
-import { discoverMovies, discoverTVShows, searchKeyword } from '@/lib/tmdb';
+import { discoverMovies, searchKeyword } from '@/lib/tmdb';
 import { getOrCreateDemoUser } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import logger from '@/lib/logger';
@@ -13,8 +13,8 @@ interface Collection {
   items: (TMDBMovie | TMDBTVShow)[];
 }
 
-// Cache discovery results for 1 hour
-export const revalidate = 3600;
+// Force dynamic rendering - client handles all data fetching via API route
+export const dynamic = 'force-dynamic';
 
 async function getWatchlistIds(userId: string | null): Promise<number[]> {
   if (!userId) return [];
@@ -25,44 +25,6 @@ async function getWatchlistIds(userId: string | null): Promise<number[]> {
     return items.map(item => item.tmdbId);
   } catch (error) {
     logger.error('Error fetching watchlist IDs', { 
-      context: 'DiscoveryPage', 
-      error: error instanceof Error ? error : new Error(String(error))
-    });
-    return [];
-  }
-}
-
-async function getDiscoverMovies(): Promise<TMDBMovie[]> {
-  try {
-    // Fetch popular movies (can be extended with filters from query params later)
-    const response = await discoverMovies({
-      page: 1,
-      sort_by: 'popularity.desc',
-    });
-    
-    const movies = response.results.filter(isMovie);
-    return movies;
-  } catch (error) {
-    logger.error('Error fetching discover movies', { 
-      context: 'DiscoveryPage', 
-      error: error instanceof Error ? error : new Error(String(error))
-    });
-    return [];
-  }
-}
-
-async function getDiscoverTVShows(): Promise<TMDBTVShow[]> {
-  try {
-    // Fetch popular TV shows (can be extended with filters from query params later)
-    const response = await discoverTVShows({
-      page: 1,
-      sort_by: 'popularity.desc',
-    });
-    
-    const tvShows = response.results.filter(isTVShow);
-    return tvShows;
-  } catch (error) {
-    logger.error('Error fetching discover TV shows', { 
       context: 'DiscoveryPage', 
       error: error instanceof Error ? error : new Error(String(error))
     });
@@ -133,17 +95,14 @@ export default async function DiscoveryPage() {
   const userId = await getOrCreateDemoUser();
   const watchlistIds = await getWatchlistIds(userId);
   
-  // Fetch movies, TV shows, and collections in parallel
-  const [movies, tvShows, collections] = await Promise.all([
-    getDiscoverMovies(),
-    getDiscoverTVShows(),
-    getCollections(),
-  ]);
+  // Fetch collections (still server-side for SEO/initial render)
+  // Movies and TV shows are fetched client-side via API route for dynamic filtering
+  const collections = await getCollections();
 
   return (
     <DiscoveryPageClient 
-      movies={movies}
-      tvShows={tvShows}
+      movies={[]} // Empty array - client will fetch via API route
+      tvShows={[]} // Empty array - client will fetch via API route
       collections={collections}
       watchlistIds={watchlistIds}
     />

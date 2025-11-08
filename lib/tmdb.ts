@@ -165,7 +165,10 @@ export interface DiscoverMoviesOptions {
   sort_by?: string;
   with_genres?: string; // Comma-separated genre IDs
   with_keywords?: string; // Comma-separated keyword IDs
+  with_original_language?: string; // ISO 639-1 language code (e.g., 'en', 'es', 'fr')
   primary_release_year?: number;
+  'primary_release_date.gte'?: string; // Date range start (YYYY-MM-DD format)
+  'primary_release_date.lte'?: string; // Date range end (YYYY-MM-DD format)
   'vote_average.gte'?: number;
   'vote_average.lte'?: number;
 }
@@ -175,7 +178,10 @@ export interface DiscoverTVOptions {
   sort_by?: string;
   with_genres?: string; // Comma-separated genre IDs
   with_keywords?: string; // Comma-separated keyword IDs
+  with_original_language?: string; // ISO 639-1 language code (e.g., 'en', 'es', 'fr')
   first_air_date_year?: number;
+  'first_air_date.gte'?: string; // Date range start (YYYY-MM-DD format)
+  'first_air_date.lte'?: string; // Date range end (YYYY-MM-DD format)
   'vote_average.gte'?: number;
   'vote_average.lte'?: number;
 }

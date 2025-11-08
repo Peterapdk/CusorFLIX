@@ -9,10 +9,12 @@ export type MediaFilter = {
   tags?: string[]; // Custom tags (future feature)
   yearRange?: { min?: number; max?: number };
   ratingRange?: { min?: number; max?: number };
+  language?: string; // ISO 639-1 language code (e.g., 'en', 'es', 'fr')
+  minRating?: number; // Minimum rating for star buttons (4, 6, or 8)
 };
 
 export type SortOption = 
-  | 'date-added' // Default - when added to list
+  | 'date-added' // When added to list (library only, not supported by TMDB Discover API)
   | 'release-date' // Release date (newest/oldest)
   | 'rating' // TMDB rating (highest/lowest)
   | 'title' // Alphabetical

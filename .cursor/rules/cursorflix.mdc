@@ -1,6 +1,62 @@
 ---
 alwaysApply: true
 ---
+# Workflow State Management (MANDATORY)
+
+Work exclusively with @cursorkleosr/project_config.md and @cursorkleosr/workflow_state.md.
+
+## Workflow Protocol
+
+### BEFORE each action:
+1. **READ** `cursorkleosr/workflow_state.md` to understand:
+   - Current phase (INIT→ANALYZE→PREPARE→IMPLEMENT→VALIDATE→COMPLETED|ROLLBACK)
+   - Current status and context
+   - Active tasks and constraints
+   - Previous actions and results
+
+2. **READ** `cursorkleosr/project_config.md` to understand:
+   - Project goals and constraints
+   - Tech stack and patterns
+   - Tokenization limits and rules
+
+3. **FOLLOW** the rules and constraints defined in both files
+
+### DURING action:
+- Apply minimal diff, maintain contracts and boundaries
+- Add/modify code with strict typing
+- Reuse utilities; avoid new dependencies unless present in repo
+- Stage safe checkpoints after each logical unit
+
+### AFTER each action:
+1. **IMMEDIATELY UPDATE** `cursorkleosr/workflow_state.md` with:
+   - Actions taken
+   - Results obtained
+   - Any state changes
+   - Errors or warnings encountered
+   - Next steps or recommendations
+
+2. **MAINTAIN** workflow state integrity:
+   - Update phase transitions
+   - Log all changes
+   - Track checkpoints
+   - Record validation results
+
+## File Paths
+- Project Config: `cursorkleosr/project_config.md`
+- Workflow State: `cursorkleosr/workflow_state.md`
+
+## Error Handling
+- If workflow files are missing or corrupted, notify the user immediately
+- Do not proceed without valid workflow state context
+- If unable to update workflow_state.md, log the reason and continue with caution
+
+## Phase Flow
+Follow the workflow phases: INIT→ANALYZE→PREPARE→IMPLEMENT→VALIDATE→COMPLETED|ROLLBACK
+
+---
+
+# Styling Rules
+
 Always use Tailwind for styling
 Use Framer Motion for animations
 Follow component naming conventions
