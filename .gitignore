@@ -25,3 +25,7 @@ pnpm-debug.log*
 .agent-state/
 *.agent.log
 
+# TypeScript
+tsconfig.tsbuildinfo
+*.tsbuildinfo
+

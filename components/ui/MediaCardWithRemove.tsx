@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react';
 import MediaCard from './MediaCard';
 import { removeFromList } from '@/server/actions/lists';
 import { useRouter } from 'next/navigation';
+import logger from '@/lib/logger';
 
 type MediaItem = {
   id: number;
@@ -45,7 +46,10 @@ export default function MediaCardWithRemove({
         await removeFromList(listItemId);
         router.refresh();
       } catch (error) {
-        console.error('Error removing item from list:', error);
+        logger.error('Error removing item from list', { 
+          context: 'MediaCardWithRemove', 
+          error: error instanceof Error ? error : new Error(String(error)) 
+        });
       }
     });
   };

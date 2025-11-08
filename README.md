@@ -9,6 +9,9 @@ A modern movie and TV show library management application built with Next.js, TM
 - 📚 Personal library with watchlists and custom lists
 - 🎥 Watch integration with CinemaOS
 - ⚙️ User settings
+- 🌓 Dark/Light mode theme support
+- 📺 TV season and episode browsing
+- ✅ Custom list management (create, edit, delete)
 
 ## Tech Stack
 
@@ -93,16 +96,22 @@ CinemaRebel/
 │   ├── tv/[id]/           # TV show details page
 │   └── watch/[type]/[id]/ # Watch page
 ├── components/            # React components
-│   ├── Card.tsx          # Reusable card component
+│   ├── ui/               # UI components (MediaCard, Carousel, etc.)
 │   ├── ErrorBoundary.tsx # Error boundary
-│   └── Navbar.tsx        # Navigation bar
+│   ├── Navbar.tsx        # Navigation bar
+│   └── PlayerFrame.tsx   # Video player frame
 ├── lib/                   # Utility libraries
+│   ├── auth.ts           # Authentication helpers
 │   ├── db.ts             # Prisma client
-│   └── tmdb.ts           # TMDB API client
+│   ├── logger.ts         # Logging utility
+│   ├── tmdb.ts           # TMDB API client
+│   └── utils.ts          # Utility functions
 ├── prisma/                # Prisma schema and migrations
 │   └── schema.prisma     # Database schema
-└── server/                # Server actions
-    └── actions/          # Server-side actions
+├── server/                # Server actions
+│   └── actions/          # Server-side actions
+├── types/                 # TypeScript type definitions
+└── hooks/                 # React hooks (use-theme)
 ```
 
 ## Database Schema
@@ -123,6 +132,16 @@ The application uses Prisma with the following models:
 | `NEXTAUTH_SECRET` | Secret for NextAuth (if using auth) | No |
 | `NEXTAUTH_URL` | Base URL for NextAuth | No |
 
+## Completed Features
+
+- ✅ Dark/Light mode theme system
+- ✅ Custom list management (create, edit, delete lists)
+- ✅ Watchlist functionality
+- ✅ TV season and episode pages
+- ✅ Frontend optimizations (Suspense boundaries, image optimization)
+- ✅ Route-level error boundaries
+- ✅ Security enhancements (CSP headers)
+
 ## Features in Development
 
 - [ ] User authentication (NextAuth.js)
@@ -131,6 +150,7 @@ The application uses Prisma with the following models:
 - [ ] Advanced filtering and sorting
 - [ ] Ratings and reviews
 - [ ] Social features (sharing lists)
+- [ ] Test coverage (vitest/jest)
 
 ## Contributing
 

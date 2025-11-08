@@ -3,6 +3,7 @@
 import { useState, useTransition } from 'react';
 import MediaCard from './MediaCard';
 import { toggleWatchlistWithAuth } from '@/server/actions/lists';
+import logger from '@/lib/logger';
 
 type MediaItem = {
   id: number;
@@ -43,7 +44,10 @@ export default function MediaCardWithWatchlist({
           setInWatchlist(result.inWatchlist);
         }
       } catch (error) {
-        console.error('Watchlist toggle error:', error);
+        logger.error('Watchlist toggle error', { 
+          context: 'MediaCardWithWatchlist', 
+          error: error instanceof Error ? error : new Error(String(error)) 
+        });
       }
     });
   };

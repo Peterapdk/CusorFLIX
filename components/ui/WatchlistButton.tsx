@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import { toggleWatchlistWithAuth } from '@/server/actions/lists';
+import logger from '@/lib/logger';
 
 interface WatchlistButtonProps {
   mediaType: 'movie' | 'tv';
@@ -30,7 +31,10 @@ export default function WatchlistButton({
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to update watchlist');
-        console.error('Watchlist toggle error:', err);
+        logger.error('Watchlist toggle error', { 
+          context: 'WatchlistButton', 
+          error: err instanceof Error ? err : new Error(String(err)) 
+        });
       }
     });
   };

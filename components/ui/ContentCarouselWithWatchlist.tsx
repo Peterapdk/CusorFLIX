@@ -3,6 +3,7 @@
 import { useState, useTransition } from 'react';
 import ContentCarousel from './ContentCarousel';
 import { toggleWatchlistWithAuth } from '@/server/actions/lists';
+import logger from '@/lib/logger';
 
 type MediaItem = {
   id: number;
@@ -52,7 +53,10 @@ export default function ContentCarouselWithWatchlist({
           });
         }
       } catch (error) {
-        console.error('Watchlist toggle error:', error);
+        logger.error('Watchlist toggle error', { 
+          context: 'ContentCarouselWithWatchlist', 
+          error: error instanceof Error ? error : new Error(String(error)) 
+        });
       }
     });
   };
