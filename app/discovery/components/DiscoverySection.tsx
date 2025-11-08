@@ -3,19 +3,28 @@
 import { useState, useMemo } from 'react';
 import MediaCardWithWatchlist from '@/components/ui/MediaCardWithWatchlist';
 import FilterSortBar from '@/app/library/components/FilterSortBar';
+import CollectionsSection from './CollectionsSection';
 import { filterItems, sortItems } from '@/lib/library-utils';
 import type { MediaFilter, SortOption, SortDirection, EnrichedLibraryItem } from '@/types/library';
 import type { TMDBMovie, TMDBTVShow } from '@/types/tmdb';
 import { isMovie, isTVShow } from '@/types/tmdb';
 
+interface Collection {
+  id: string;
+  name: string;
+  description?: string;
+  items: (TMDBMovie | TMDBTVShow)[];
+}
+
 interface DiscoverySectionProps {
   movies: TMDBMovie[];
   tvShows: TMDBTVShow[];
+  collections: Collection[];
   watchlistIds: number[];
   onWatchlistToggle?: (id: number) => void;
 }
 
-type TabType = 'movies' | 'tv';
+type TabType = 'movies' | 'tv' | 'collections';
 
 // Convert TMDB types to EnrichedLibraryItem format for filtering/sorting
 function toEnrichedItem(item: TMDBMovie | TMDBTVShow): {
@@ -58,6 +67,7 @@ function toEnrichedItem(item: TMDBMovie | TMDBTVShow): {
 export default function DiscoverySection({
   movies,
   tvShows,
+  collections,
   watchlistIds,
   onWatchlistToggle
 }: DiscoverySectionProps) {
@@ -158,22 +168,52 @@ export default function DiscoverySection({
             <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />
           )}
         </button>
+        <button
+          onClick={() => setActiveTab('collections')}
+          className={`px-6 py-3 font-medium text-sm transition-colors relative ${
+            activeTab === 'collections'
+              ? 'text-foreground'
+              : 'text-muted-foreground hover:text-foreground'
+          }`}
+        >
+          Collections
+          {collections.length > 0 && (
+            <span className={`ml-2 px-2 py-0.5 rounded-full text-xs ${
+              activeTab === 'collections'
+                ? 'bg-primary text-primary-foreground'
+                : 'bg-muted text-muted-foreground'
+            }`}>
+              {collections.length}
+            </span>
+          )}
+          {activeTab === 'collections' && (
+            <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />
+          )}
+        </button>
       </div>
 
-      {/* Filter/Sort Bar */}
-      <FilterSortBar
-        filters={filters}
-        sortOption={sortOption}
-        sortDirection={sortDirection}
-        mediaType={activeTab === 'movies' ? 'movie' : 'tv'}
-        onFilterChange={handleFilterChange}
-        onSortChange={handleSortChange}
-        onClearFilters={handleClearFilters}
-      />
+      {/* Filter/Sort Bar - Only show for Movies and TV Shows tabs */}
+      {activeTab !== 'collections' && (
+        <FilterSortBar
+          filters={filters}
+          sortOption={sortOption}
+          sortDirection={sortDirection}
+          mediaType={activeTab === 'movies' ? 'movie' : 'tv'}
+          onFilterChange={handleFilterChange}
+          onSortChange={handleSortChange}
+          onClearFilters={handleClearFilters}
+        />
+      )}
 
       {/* Content */}
       <div className="mt-6">
-        {filteredAndSortedItems.length === 0 ? (
+        {activeTab === 'collections' ? (
+          <CollectionsSection
+            collections={collections}
+            watchlistIds={watchlistIds}
+            onWatchlistToggle={onWatchlistToggle}
+          />
+        ) : filteredAndSortedItems.length === 0 ? (
           <div className="text-center py-16">
             <div className="w-20 h-20 bg-card rounded-full flex items-center justify-center mx-auto mb-4">
               <svg className="w-10 h-10 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -4,15 +4,24 @@ import { useRouter } from 'next/navigation';
 import DiscoverySection from './components/DiscoverySection';
 import type { TMDBMovie, TMDBTVShow } from '@/types/tmdb';
 
+interface Collection {
+  id: string;
+  name: string;
+  description?: string;
+  items: (TMDBMovie | TMDBTVShow)[];
+}
+
 interface DiscoveryPageClientProps {
   movies: TMDBMovie[];
   tvShows: TMDBTVShow[];
+  collections: Collection[];
   watchlistIds: number[];
 }
 
 export default function DiscoveryPageClient({ 
   movies, 
   tvShows,
+  collections,
   watchlistIds
 }: DiscoveryPageClientProps) {
   const router = useRouter();
@@ -37,6 +46,7 @@ export default function DiscoveryPageClient({
         <DiscoverySection
           movies={movies}
           tvShows={tvShows}
+          collections={collections}
           watchlistIds={watchlistIds}
           onWatchlistToggle={handleWatchlistToggle}
         />

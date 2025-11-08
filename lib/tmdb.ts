@@ -144,10 +144,27 @@ export async function getTVSeason(id: string | number, seasonNumber: number): Pr
   return tmdbFetch<TMDBSeasonDetails>(`/tv/${id}/season/${seasonNumber}`, { query: { language: 'en-US' } });
 }
 
+export interface TMDBKeyword {
+  id: number;
+  name: string;
+}
+
+export interface TMDBKeywordSearchResponse {
+  page: number;
+  results: TMDBKeyword[];
+  total_pages: number;
+  total_results: number;
+}
+
+export async function searchKeyword(query: string): Promise<TMDBKeywordSearchResponse> {
+  return tmdbFetch<TMDBKeywordSearchResponse>(`/search/keyword`, { query: { query, page: 1 } });
+}
+
 export interface DiscoverMoviesOptions {
   page?: number;
   sort_by?: string;
   with_genres?: string; // Comma-separated genre IDs
+  with_keywords?: string; // Comma-separated keyword IDs
   primary_release_year?: number;
   'vote_average.gte'?: number;
   'vote_average.lte'?: number;
@@ -157,6 +174,7 @@ export interface DiscoverTVOptions {
   page?: number;
   sort_by?: string;
   with_genres?: string; // Comma-separated genre IDs
+  with_keywords?: string; // Comma-separated keyword IDs
   first_air_date_year?: number;
   'vote_average.gte'?: number;
   'vote_average.lte'?: number;
@@ -188,6 +206,7 @@ export const tmdb = {
   getTVSeason,
   discoverMovies,
   discoverTVShows,
+  searchKeyword,
 };
 
 
