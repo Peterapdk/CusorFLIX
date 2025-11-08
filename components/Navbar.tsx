@@ -11,6 +11,7 @@ export default function Navbar() {
   const navItems: Array<{ href: Route; label: string }> = [
     { href: '/', label: 'Home' },
     { href: '/search', label: 'Search' },
+    { href: '/discovery', label: 'Discover' },
     { href: '/library', label: 'Library' },
     { href: '/settings', label: 'Settings' },
   ];
