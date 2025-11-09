@@ -1,4 +1,4 @@
-import { getMovieDetails } from '@/lib/tmdb';
+import { tmdbEnhanced } from '@/lib/tmdb-enhanced';
 import Image from 'next/image';
 import Link from 'next/link';
 import Script from 'next/script';
@@ -35,7 +35,7 @@ export default async function MovieDetailsPage(props: { params: Promise<{ id: st
   const { id } = await props.params;
   const userId = await getOrCreateDemoUser();
   
-  const movie = await getMovieDetails(id, { append_to_response: 'credits,recommendations' }).catch((error) => {
+  const movie = await tmdbEnhanced.getMovieDetails(id, { append_to_response: 'credits,recommendations' }).catch((error) => {
     logger.error('Error fetching movie details', { 
       context: 'MovieDetailsPage', 
       movieId: id,

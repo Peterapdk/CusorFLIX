@@ -13,6 +13,7 @@ Target: green build (lint/typecheck/tests), minimal diff, zero regressions
 - Framework: Next.js 15.0.3 (App Router)
 - Database: PostgreSQL with Prisma ORM 5.20.0
 - Styling: Tailwind CSS 3.4.14
+- Theming: next-themes 0.4.6 (dark/light mode support)
 - JS/TS Tooling: npm | eslint (Next.js config) | TypeScript strict mode | tsc
 - External APIs: TMDB API (The Movie Database) | CinemaOS (video player)
 - Build/CI: Next.js build | Prisma migrations | (GitHub Actions - not configured)
@@ -26,9 +27,11 @@ Target: green build (lint/typecheck/tests), minimal diff, zero regressions
 - Component-based React; reusable UI components in `components/`
 - Prisma Client for database access; migrations for schema changes
 - Tailwind CSS for styling; custom cinema theme colors
+- Theme management via next-themes (dark/light mode with system preference)
 - Strict TypeScript: no any; strict mode enabled; path aliases (@/*)
 - Secrets via env only (DATABASE_URL, TMDB_API_KEY); never log secrets
 - TMDB API integration via lib/tmdb.ts; CinemaOS iframe embedding
+- Server Actions body size limit: 2mb (configured in next.config.mjs)
 <!-- STATIC:PATTERNS:END -->
 
 <!-- STATIC:CONSTRAINTS:START -->

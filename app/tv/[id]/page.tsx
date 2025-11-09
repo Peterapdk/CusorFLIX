@@ -1,4 +1,4 @@
-import { getTVDetails, getTVSeason } from '@/lib/tmdb';
+import { tmdbEnhanced } from '@/lib/tmdb-enhanced';
 import Image from 'next/image';
 import Link from 'next/link';
 import Script from 'next/script';
@@ -35,7 +35,7 @@ export default async function TVDetailsPage(props: { params: Promise<{ id: strin
   const { id } = await props.params;
   const userId = await getOrCreateDemoUser();
   
-  const tv = await getTVDetails(id, { append_to_response: 'seasons,credits,recommendations' }).catch((error) => {
+  const tv = await tmdbEnhanced.getTVDetails(id, { append_to_response: 'seasons,credits,recommendations' }).catch((error) => {
     logger.error('Error fetching TV show details', { 
       context: 'TVDetailsPage', 
       tvId: id,
@@ -170,8 +170,8 @@ export default async function TVDetailsPage(props: { params: Promise<{ id: strin
                 seasons
                   .filter((season) => season.season_number >= 0 && season.air_date)
                   .map(async (season) => {
-                    // Fetch season details to get episode count
-                    const seasonDetails = await getTVSeason(id, season.season_number).catch((error) => {
+                    // Fetch season details to get episode count (with caching)
+                    const seasonDetails = await tmdbEnhanced.getTVSeason(id, season.season_number).catch((error) => {
                       logger.error('Error fetching season details', { 
                         context: 'TVDetailsPage', 
                         tvId: id,

@@ -1,4 +1,4 @@
-import { searchMulti } from '@/lib/tmdb';
+import { tmdbEnhanced } from '@/lib/tmdb-enhanced';
 import Link from 'next/link';
 import MediaCardWithWatchlist from '@/components/ui/MediaCardWithWatchlist';
 import type { TMDBMediaItem, TMDBMovie, TMDBTVShow, TMDBPerson } from '@/types/tmdb';
@@ -31,7 +31,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
   const userId = await getOrCreateDemoUser();
   const watchlistIds = await getWatchlistIds(userId);
   
-  const data = q ? await searchMulti(q, 1).catch((error) => {
+  const data = q ? await tmdbEnhanced.searchMulti(q, 1).catch((error) => {
     logger.error('Error searching TMDB', { 
       context: 'SearchPage', 
       query: q,

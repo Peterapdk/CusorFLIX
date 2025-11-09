@@ -1,4 +1,4 @@
-import { getTVDetails, getTVSeason } from '@/lib/tmdb';
+import { tmdbEnhanced } from '@/lib/tmdb-enhanced';
 import Image from 'next/image';
 import Link from 'next/link';
 import type { TMDBSeasonDetails } from '@/types/tmdb';
@@ -9,10 +9,10 @@ export default async function TVSeasonPage(props: { params: Promise<{ id: string
   const { id, season } = await props.params;
   const seasonNum = Number(season);
 
-  // Fetch TV show basic info (name/backdrop) and the specific season details
+  // Fetch TV show basic info (name/backdrop) and the specific season details (with caching)
   const [tv, seasonDetails] = await Promise.all([
-    getTVDetails(id).catch(() => null),
-    getTVSeason(id, seasonNum).catch(() => null)
+    tmdbEnhanced.getTVDetails(id).catch(() => null),
+    tmdbEnhanced.getTVSeason(id, seasonNum).catch(() => null)
   ]);
 
   if (!tv || !seasonDetails) {

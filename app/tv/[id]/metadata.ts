@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { getTVDetails } from '@/lib/tmdb';
+import { tmdbEnhanced } from '@/lib/tmdb-enhanced';
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -7,7 +7,7 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
-  const tv = await getTVDetails(id).catch(() => null);
+  const tv = await tmdbEnhanced.getTVDetails(id).catch(() => null);
 
   if (!tv) {
     return {

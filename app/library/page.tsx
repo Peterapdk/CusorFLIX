@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/db';
-import { getMovieDetails, getTVDetails } from '@/lib/tmdb';
+import { tmdbEnhanced } from '@/lib/tmdb-enhanced';
 import { getOrCreateDemoUser } from '@/lib/auth';
 import logger from '@/lib/logger';
 import type { TMDBMovieDetails, TMDBTVShowDetails } from '@/types/tmdb';
@@ -35,7 +35,7 @@ async function enrichItems(items: Array<{ id: string; mediaType: string; tmdbId:
     items.map(async (item) => {
       try {
         if (item.mediaType === 'movie') {
-          const details = await getMovieDetails(item.tmdbId.toString()) as TMDBMovieDetails;
+          const details = await tmdbEnhanced.getMovieDetails(item.tmdbId.toString()) as TMDBMovieDetails;
           return {
             listItemId: item.id,
             id: item.tmdbId,
@@ -48,7 +48,7 @@ async function enrichItems(items: Array<{ id: string; mediaType: string; tmdbId:
             addedAt: item.createdAt,
           };
         } else {
-          const details = await getTVDetails(item.tmdbId.toString()) as TMDBTVShowDetails;
+          const details = await tmdbEnhanced.getTVDetails(item.tmdbId.toString()) as TMDBTVShowDetails;
           return {
             listItemId: item.id,
             id: item.tmdbId,

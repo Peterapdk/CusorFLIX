@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import { getTrending } from '@/lib/tmdb';
+import { tmdbEnhanced } from '@/lib/tmdb-enhanced';
 import HeroSection from '@/components/ui/HeroSection';
 import ContentCarouselWithWatchlist from '@/components/ui/ContentCarouselWithWatchlist';
 import HeroSkeleton from '@/components/ui/HeroSkeleton';
@@ -31,7 +31,7 @@ async function getWatchlistIds(userId: string | null): Promise<number[]> {
 
 // Async component for hero section
 async function HeroContent() {
-  const movies = await getTrending('movie', 'week').catch((error) => {
+  const movies = await tmdbEnhanced.getTrending('movie', 'week').catch((error) => {
     logger.error('Error loading hero content', { context: 'HomePage', error: error instanceof Error ? error : new Error(String(error)) });
     return { results: [] };
   });
@@ -49,7 +49,7 @@ async function TrendingMovies() {
   const userId = await getOrCreateDemoUser();
   const watchlistIds = await getWatchlistIds(userId);
   
-  const movies = await getTrending('movie', 'week').catch((error) => {
+  const movies = await tmdbEnhanced.getTrending('movie', 'week').catch((error) => {
     logger.error('Error loading trending movies', { context: 'HomePage', error: error instanceof Error ? error : new Error(String(error)) });
     return { results: [] };
   });
@@ -83,7 +83,7 @@ async function TrendingTVShows() {
   const userId = await getOrCreateDemoUser();
   const watchlistIds = await getWatchlistIds(userId);
   
-  const tv = await getTrending('tv', 'week').catch((error) => {
+  const tv = await tmdbEnhanced.getTrending('tv', 'week').catch((error) => {
     logger.error('Error loading trending TV shows', { context: 'HomePage', error: error instanceof Error ? error : new Error(String(error)) });
     return { results: [] };
   });

@@ -1,4 +1,4 @@
-import { discoverMovies, searchKeyword } from '@/lib/tmdb';
+import { tmdbEnhanced } from '@/lib/tmdb-enhanced';
 import { getOrCreateDemoUser } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import logger from '@/lib/logger';
@@ -34,13 +34,13 @@ async function getWatchlistIds(userId: string | null): Promise<number[]> {
 
 async function getChristmasMovies(): Promise<TMDBMovie[]> {
   try {
-    // Search for Christmas keyword
-    const keywordResponse = await searchKeyword('christmas').catch(() => null);
+    // Search for Christmas keyword (with caching)
+    const keywordResponse = await tmdbEnhanced.searchKeyword('christmas').catch(() => null);
     
     if (!keywordResponse || keywordResponse.results.length === 0) {
       logger.warn('Christmas keyword not found, using fallback', { context: 'DiscoveryPage' });
       // Fallback: Use a known Christmas keyword ID (1743) if search fails
-      const response = await discoverMovies({
+      const response = await tmdbEnhanced.discoverMovies({
         page: 1,
         sort_by: 'popularity.desc',
         with_keywords: '1743', // Christmas keyword ID
@@ -50,7 +50,7 @@ async function getChristmasMovies(): Promise<TMDBMovie[]> {
     
     // Use the first Christmas keyword found
     const christmasKeywordId = keywordResponse.results[0].id.toString();
-    const response = await discoverMovies({
+    const response = await tmdbEnhanced.discoverMovies({
       page: 1,
       sort_by: 'popularity.desc',
       with_keywords: christmasKeywordId,

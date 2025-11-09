@@ -56,13 +56,28 @@ export default function PlayerFrame({ src, className }: PlayerFrameProps) {
         if (iframe?.contentWindow) {
           // This won't work due to cross-origin restrictions, but we try
           try {
-            (iframe.contentWindow as any).open = () => null;
+            // Type-safe approach: use Record type to override open method
+            // Note: This will fail in cross-origin contexts, which is expected
+            type WindowWithOverride = Record<string, unknown> & {
+              open: (url?: string | URL, target?: string, features?: string) => Window | null;
+            };
+            const iframeWindow = iframe.contentWindow as unknown as WindowWithOverride;
+            // Attempt to override - will fail for cross-origin iframes
+            if (typeof iframeWindow.open === 'function') {
+              iframeWindow.open = () => null;
+            }
           } catch (e) {
-            // Cross-origin - expected
+            // Cross-origin - expected, cannot access iframe contentWindow
+            logger.debug('Cannot override iframe window.open due to cross-origin restrictions', {
+              context: 'PlayerFrame',
+            });
           }
         }
       } catch (e) {
         // Expected for cross-origin iframes
+        logger.debug('Cannot access iframe contentWindow due to cross-origin restrictions', {
+          context: 'PlayerFrame',
+        });
       }
     };
 

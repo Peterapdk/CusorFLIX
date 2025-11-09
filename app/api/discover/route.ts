@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { discoverMovies, discoverTVShows } from '@/lib/tmdb';
+import { tmdbEnhanced } from '@/lib/tmdb-enhanced';
 import { isMovie, isTVShow } from '@/types/tmdb';
 import type { MediaFilter, SortOption } from '@/types/library';
 import logger from '@/lib/logger';
@@ -144,12 +144,12 @@ export async function GET(request: NextRequest) {
     // Add page number
     discoverOptions.page = page;
 
-    // Fetch from TMDB
+    // Fetch from TMDB (with caching via enhanced client)
     let response;
     if (type === 'movie') {
-      response = await discoverMovies(discoverOptions);
+      response = await tmdbEnhanced.discoverMovies(discoverOptions);
     } else {
-      response = await discoverTVShows(discoverOptions);
+      response = await tmdbEnhanced.discoverTVShows(discoverOptions);
     }
 
     // Filter results to ensure correct type

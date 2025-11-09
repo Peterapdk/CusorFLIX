@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import MediaCardWithWatchlist from '@/components/ui/MediaCardWithWatchlist';
 import FiltersPanel from './FiltersPanel';
 import SortPanel from './SortPanel';
 import CollectionsSection from './CollectionsSection';
 import type { MediaFilter, SortOption, SortDirection } from '@/types/library';
 import type { TMDBMovie, TMDBTVShow } from '@/types/tmdb';
+import logger from '@/lib/logger';
 
 interface Collection {
   id: string;
@@ -122,7 +123,13 @@ export default function DiscoverySection({
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to fetch items';
       setError(errorMessage);
-      console.error('Error fetching discover items:', err);
+      logger.error('Error fetching discover items', {
+        context: 'DiscoverySection',
+        error: err instanceof Error ? err : new Error(String(err)),
+        page,
+        type,
+        filters: activeFilters,
+      });
     } finally {
       setIsLoading(false);
       setIsLoadingMore(false);
