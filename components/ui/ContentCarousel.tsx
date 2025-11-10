@@ -34,6 +34,8 @@ interface ContentCarouselProps {
   showRanking?: boolean;
   onWatchlistToggle?: (id: number) => void;
   watchlistIds?: number[];
+  hideTitle?: boolean;
+  noSectionWrapper?: boolean;
 }
 
 export default function ContentCarousel({ 
@@ -41,7 +43,9 @@ export default function ContentCarousel({
   items, 
   showRanking = false, 
   onWatchlistToggle,
-  watchlistIds = []
+  watchlistIds = [],
+  hideTitle = false,
+  noSectionWrapper = false
 }: ContentCarouselProps) {
   const [scrollPosition, setScrollPosition] = useState(0);
   const [canScrollRight, setCanScrollRight] = useState(true);
@@ -87,42 +91,44 @@ export default function ContentCarousel({
     return null;
   }
 
-  return (
-    <section className="py-8">
+  const carouselContent = (
+    <>
       {/* Section Header */}
-      <div className="container mx-auto px-6 mb-6">
-        <div className="flex items-center justify-between">
-          <h2 className="text-section font-semibold text-foreground">{title}</h2>
-          {items.length > 6 && (
-            <div className="flex space-x-2">
-              <button
-                onClick={() => scroll('left')}
-                disabled={!canScrollLeft}
-                aria-label="Scroll carousel left"
-                className={`p-2 rounded-full transition-colors ${
-                  canScrollLeft 
-                    ? 'bg-secondary hover:bg-secondary/80 text-secondary-foreground' 
-                    : 'bg-secondary text-muted-foreground cursor-not-allowed'
-                }`}
-              >
-                <ChevronLeftIcon className="w-5 h-5" />
-              </button>
-              <button
-                onClick={() => scroll('right')}
-                disabled={!canScrollRight}
-                aria-label="Scroll carousel right"
-                className={`p-2 rounded-full transition-colors ${
-                  canScrollRight 
-                    ? 'bg-secondary hover:bg-secondary/80 text-secondary-foreground' 
-                    : 'bg-secondary text-muted-foreground cursor-not-allowed'
-                }`}
-              >
-                <ChevronRightIcon className="w-5 h-5" />
-              </button>
-            </div>
-          )}
+      {!hideTitle && (
+        <div className="container mx-auto px-6 mb-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-section font-semibold text-foreground">{title}</h2>
+            {items.length > 6 && (
+              <div className="flex space-x-2">
+                <button
+                  onClick={() => scroll('left')}
+                  disabled={!canScrollLeft}
+                  aria-label="Scroll carousel left"
+                  className={`p-2 rounded-full transition-colors ${
+                    canScrollLeft 
+                      ? 'bg-secondary hover:bg-secondary/80 text-secondary-foreground' 
+                      : 'bg-secondary text-muted-foreground cursor-not-allowed'
+                  }`}
+                >
+                  <ChevronLeftIcon className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={() => scroll('right')}
+                  disabled={!canScrollRight}
+                  aria-label="Scroll carousel right"
+                  className={`p-2 rounded-full transition-colors ${
+                    canScrollRight 
+                      ? 'bg-secondary hover:bg-secondary/80 text-secondary-foreground' 
+                      : 'bg-secondary text-muted-foreground cursor-not-allowed'
+                  }`}
+                >
+                  <ChevronRightIcon className="w-5 h-5" />
+                </button>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Carousel Container */}
       <div className="relative">
@@ -167,6 +173,16 @@ export default function ContentCarousel({
           ))}
         </div>
       </div>
+    </>
+  );
+
+  if (noSectionWrapper) {
+    return carouselContent;
+  }
+
+  return (
+    <section className="py-8">
+      {carouselContent}
     </section>
   );
 }

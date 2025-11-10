@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 import { tmdbEnhanced } from '@/lib/tmdb-enhanced';
 import HeroSection from '@/components/ui/HeroSection';
-import ContentCarouselWithWatchlist from '@/components/ui/ContentCarouselWithWatchlist';
+import Top10TrendingSection from '@/components/ui/Top10TrendingSection';
 import HeroSkeleton from '@/components/ui/HeroSkeleton';
 import CarouselSkeleton from '@/components/ui/CarouselSkeleton';
 import logger from '@/lib/logger';
@@ -46,8 +46,8 @@ async function HeroContent() {
   return <HeroSection featuredContent={moviesWithType[0]} />;
 }
 
-// Async component for trending movies
-async function TrendingMovies() {
+// Async component for movies with Top 10 & Trending selector
+async function MoviesSection() {
   const userId = await getOrCreateDemoUser();
   const watchlistIds = await getWatchlistIds(userId);
   
@@ -63,25 +63,17 @@ async function TrendingMovies() {
   if (moviesWithType.length === 0) return null;
   
   return (
-    <>
-      <ContentCarouselWithWatchlist
-        title="Top 10 Movies"
-        items={moviesWithType.slice(0, 10)}
-        showRanking={true}
-        watchlistIds={watchlistIds}
-      />
-      <ContentCarouselWithWatchlist
-        title="Trending Movies"
-        items={moviesWithType}
-        showRanking={false}
-        watchlistIds={watchlistIds}
-      />
-    </>
+    <Top10TrendingSection
+      title="Movies"
+      top10Items={moviesWithType.slice(0, 10)}
+      trendingItems={moviesWithType}
+      watchlistIds={watchlistIds}
+    />
   );
 }
 
-// Async component for trending TV shows
-async function TrendingTVShows() {
+// Async component for TV shows with Top 10 & Trending selector
+async function TVShowsSection() {
   const userId = await getOrCreateDemoUser();
   const watchlistIds = await getWatchlistIds(userId);
   
@@ -97,20 +89,12 @@ async function TrendingTVShows() {
   if (tvWithType.length === 0) return null;
   
   return (
-    <>
-      <ContentCarouselWithWatchlist
-        title="Top 10 Shows"
-        items={tvWithType.slice(0, 10)}
-        showRanking={true}
-        watchlistIds={watchlistIds}
-      />
-      <ContentCarouselWithWatchlist
-        title="Trending TV"
-        items={tvWithType}
-        showRanking={false}
-        watchlistIds={watchlistIds}
-      />
-    </>
+    <Top10TrendingSection
+      title="TV Shows"
+      top10Items={tvWithType.slice(0, 10)}
+      trendingItems={tvWithType}
+      watchlistIds={watchlistIds}
+    />
   );
 }
 
@@ -124,12 +108,12 @@ export default function HomePage() {
 
       {/* Content Sections with Suspense */}
       <div className="relative z-10 -mt-32 space-y-8">
-        <Suspense fallback={<><CarouselSkeleton /><CarouselSkeleton /></>}>
-          <TrendingMovies />
+        <Suspense fallback={<CarouselSkeleton />}>
+          <MoviesSection />
         </Suspense>
 
-        <Suspense fallback={<><CarouselSkeleton /><CarouselSkeleton /></>}>
-          <TrendingTVShows />
+        <Suspense fallback={<CarouselSkeleton />}>
+          <TVShowsSection />
         </Suspense>
       </div>
     </main>

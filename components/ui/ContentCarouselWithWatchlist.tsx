@@ -22,13 +22,17 @@ interface ContentCarouselWithWatchlistProps {
   items: MediaItem[];
   showRanking?: boolean;
   watchlistIds?: number[];
+  hideTitle?: boolean;
+  noSectionWrapper?: boolean;
 }
 
 export default function ContentCarouselWithWatchlist({
   title,
   items,
   showRanking = false,
-  watchlistIds = []
+  watchlistIds = [],
+  hideTitle = false,
+  noSectionWrapper = false
 }: ContentCarouselWithWatchlistProps) {
   const [watchlistState, setWatchlistState] = useState<Set<number>>(new Set(watchlistIds));
   const [isPending, startTransition] = useTransition();
@@ -68,6 +72,8 @@ export default function ContentCarouselWithWatchlist({
       showRanking={showRanking}
       onWatchlistToggle={handleWatchlistToggle}
       watchlistIds={Array.from(watchlistState)}
+      hideTitle={hideTitle}
+      noSectionWrapper={noSectionWrapper}
     />
   );
 }
