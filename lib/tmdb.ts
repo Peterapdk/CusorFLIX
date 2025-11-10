@@ -8,11 +8,12 @@ import type {
 } from '@/types/tmdb';
 import logger from '@/lib/logger';
 
-const TMDB_BASE_URL = process.env.NEXT_PUBLIC_TMDB_BASE_URL || 'https://api.themoviedb.org/3';
-const TMDB_V4_BASE_URL = process.env.NEXT_PUBLIC_TMDB_V4_BASE_URL || 'https://api.themoviedb.org/4';
+const TMDB_BASE_URL = process.env.NEXT_PUBLIC_TMDB_BASE_URL?.trim() || 'https://api.themoviedb.org/3';
+const TMDB_V4_BASE_URL = process.env.NEXT_PUBLIC_TMDB_V4_BASE_URL?.trim() || 'https://api.themoviedb.org/4';
 
-const TMDB_API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY;
-const TMDB_READ_ACCESS_TOKEN = process.env.TMDB_READ_ACCESS_TOKEN;
+// Trim whitespace from environment variables to prevent authentication errors
+const TMDB_API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY?.trim();
+const TMDB_READ_ACCESS_TOKEN = process.env.TMDB_READ_ACCESS_TOKEN?.trim();
 
 type HttpMethod = 'GET' | 'POST' | 'DELETE';
 
