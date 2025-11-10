@@ -62,8 +62,19 @@ async function tmdbFetch<T>(path: string, init?: { method?: HttpMethod; body?: u
     }
   }
 
+  // Always use API key if READ_ACCESS_TOKEN is not available
+  // This ensures we have authentication even if token is missing
   if (!TMDB_READ_ACCESS_TOKEN && TMDB_API_KEY) {
     url.searchParams.set('api_key', TMDB_API_KEY);
+  }
+  
+  // Log authentication method for debugging (in non-production)
+  if (process.env.NODE_ENV !== 'production' && (!TMDB_READ_ACCESS_TOKEN && !TMDB_API_KEY)) {
+    logger.warn('TMDB API: No authentication credentials available', {
+      context: 'TMDB',
+      hasToken: !!TMDB_READ_ACCESS_TOKEN,
+      hasKey: !!TMDB_API_KEY,
+    });
   }
 
   // Retry loop with exponential backoff

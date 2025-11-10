@@ -10,8 +10,10 @@ import { isMovie, isTVShow } from '@/types/tmdb';
 import { getOrCreateDemoUser } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 
-// Removed force-dynamic to enable proper caching with revalidation
-export const revalidate = 3600; // Revalidate every hour
+// Use dynamic rendering to ensure environment variables are available at runtime
+// This prevents build-time errors when TMDB API keys are not available during build
+export const dynamic = 'force-dynamic';
+export const revalidate = 0; // Disable static generation for now
 
 async function getWatchlistIds(userId: string | null): Promise<number[]> {
   if (!userId) return [];
