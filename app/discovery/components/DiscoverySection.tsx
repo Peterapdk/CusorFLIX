@@ -22,6 +22,7 @@ interface DiscoverySectionProps {
   collections: Collection[];
   watchlistIds: number[];
   onWatchlistToggle?: (id: number) => void;
+  searchQuery?: string;
 }
 
 type TabType = 'movies' | 'tv' | 'collections';
@@ -38,7 +39,8 @@ export default function DiscoverySection({
   tvShows: initialTVShows,
   collections,
   watchlistIds,
-  onWatchlistToggle
+  onWatchlistToggle,
+  searchQuery
 }: DiscoverySectionProps) {
   const [activeTab, setActiveTab] = useState<TabType>('movies');
   const [filters, setFilters] = useState<MediaFilter>({});
@@ -68,11 +70,13 @@ export default function DiscoverySection({
     append: boolean = false,
     currentFilters?: MediaFilter,
     currentSortOption?: SortOption,
-    currentSortDirection?: SortDirection
+    currentSortDirection?: SortDirection,
+    currentSearchQuery?: string
   ) => {
     const activeFilters = currentFilters ?? filters;
     const activeSortOption = currentSortOption ?? sortOption;
     const activeSortDirection = currentSortDirection ?? sortDirection;
+    const activeSearchQuery = currentSearchQuery ?? searchQuery;
     const type = activeTab === 'movies' ? 'movie' : 'tv';
 
     try {
@@ -83,22 +87,58 @@ export default function DiscoverySection({
       }
       setError(null);
 
-      const params = new URLSearchParams({
-        type,
-        page: page.toString(),
-        filters: JSON.stringify(activeFilters),
-        sortOption: activeSortOption,
-        sortDirection: activeSortDirection,
-      });
+      let data: DiscoverResponse;
 
-      const response = await fetch(`/api/discover?${params.toString()}`);
-      
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || `HTTP ${response.status}`);
+      // If there's a search query, use search API
+      if (activeSearchQuery?.trim()) {
+        const params = new URLSearchParams({
+          q: activeSearchQuery.trim(),
+          page: page.toString(),
+        });
+
+        const response = await fetch(`/api/search?${params.toString()}`);
+        
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.error || `HTTP ${response.status}`);
+        }
+
+        const searchData = await response.json();
+        
+        // Filter results by type
+        const filteredResults = searchData.results?.filter((item: TMDBMovie | TMDBTVShow) => {
+          if (type === 'movie') {
+            return 'title' in item;
+          } else {
+            return 'name' in item;
+          }
+        }) || [];
+
+        data = {
+          results: filteredResults,
+          page: searchData.page || page,
+          total_pages: searchData.total_pages || 1,
+          total_results: filteredResults.length,
+        };
+      } else {
+        // Use discover API
+        const params = new URLSearchParams({
+          type,
+          page: page.toString(),
+          filters: JSON.stringify(activeFilters),
+          sortOption: activeSortOption,
+          sortDirection: activeSortDirection,
+        });
+
+        const response = await fetch(`/api/discover?${params.toString()}`);
+        
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.error || `HTTP ${response.status}`);
+        }
+
+        data = await response.json();
       }
-
-      const data: DiscoverResponse = await response.json();
 
       if (append) {
         // Append new items
@@ -123,18 +163,19 @@ export default function DiscoverySection({
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to fetch items';
       setError(errorMessage);
-      logger.error('Error fetching discover items', {
+      logger.error('Error fetching items', {
         context: 'DiscoverySection',
         error: err instanceof Error ? err : new Error(String(err)),
         page,
         type,
         filters: activeFilters,
+        searchQuery: activeSearchQuery,
       });
     } finally {
       setIsLoading(false);
       setIsLoadingMore(false);
     }
-  }, [activeTab, filters, sortOption, sortDirection]);
+  }, [activeTab, filters, sortOption, sortDirection, searchQuery]);
 
   // Debounce timer ref
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -172,9 +213,42 @@ export default function DiscoverySection({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
 
-  // Fetch when filters or sort change (debounced)
+  // Fetch when search query changes
   useEffect(() => {
     if (activeTab === 'collections') return;
+    
+    // Clear any pending debounced calls
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+    
+    setCurrentPage(1);
+    setHasMore(true);
+    setError(null);
+    
+    // Reset items when search query changes
+    if (activeTab === 'movies') {
+      setMovies([]);
+    } else if (activeTab === 'tv') {
+      setTVShows([]);
+    }
+
+    // Debounce the fetch
+    debounceTimerRef.current = setTimeout(() => {
+      fetchItems(1, false, filters, sortOption, sortDirection, searchQuery);
+    }, 500);
+
+    // Cleanup function
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+    };
+  }, [searchQuery, activeTab, fetchItems, filters, sortOption, sortDirection]);
+
+  // Fetch when filters or sort change (debounced)
+  useEffect(() => {
+    if (activeTab === 'collections' || searchQuery?.trim()) return; // Skip if searching
     
     // Clear any pending debounced calls
     if (debounceTimerRef.current) {
@@ -203,7 +277,7 @@ export default function DiscoverySection({
         clearTimeout(debounceTimerRef.current);
       }
     };
-  }, [filters, sortOption, sortDirection, activeTab, fetchItems]);
+  }, [filters, sortOption, sortDirection, activeTab, fetchItems, searchQuery]);
 
   // Infinite scroll with Intersection Observer
   useEffect(() => {
@@ -259,18 +333,6 @@ export default function DiscoverySection({
 
   return (
     <section className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-semibold text-foreground">Discovery</h2>
-          {activeTab !== 'collections' && (
-            <p className="text-muted-foreground">
-              {isLoading ? 'Loading...' : error ? error : totalResults > 100 ? '100+ items' : `${totalResults} ${totalResults === 1 ? 'item' : 'items'}`}
-            </p>
-          )}
-        </div>
-      </div>
-
       {/* Tabs */}
       <div className="flex space-x-1 border-b border-border">
         <button
@@ -375,24 +437,28 @@ export default function DiscoverySection({
         </div>
       ) : (
         <div className="space-y-4 lg:space-y-0 lg:flex lg:flex-row lg:gap-6">
-          {/* Filters Panel - Left Sidebar */}
-          <div className="lg:w-64 lg:flex-shrink-0">
-            <FiltersPanel
-              filters={filters}
-              mediaType={activeTab === 'movies' ? 'movie' : 'tv'}
-              onFilterChange={handleFilterChange}
-              onClearFilters={handleClearFilters}
-            />
-          </div>
+          {/* Filters Panel - Left Sidebar (hidden when searching) */}
+          {!searchQuery?.trim() && (
+            <div className="lg:w-64 lg:flex-shrink-0">
+              <FiltersPanel
+                filters={filters}
+                mediaType={activeTab === 'movies' ? 'movie' : 'tv'}
+                onFilterChange={handleFilterChange}
+                onClearFilters={handleClearFilters}
+              />
+            </div>
+          )}
 
           {/* Content Grid - Center */}
           <div className="flex-1 min-w-0">
             <div className="relative">
-              <SortPanel
-                sortOption={sortOption}
-                sortDirection={sortDirection}
-                onSortChange={handleSortChange}
-              />
+              {!searchQuery?.trim() && (
+                <SortPanel
+                  sortOption={sortOption}
+                  sortDirection={sortDirection}
+                  onSortChange={handleSortChange}
+                />
+              )}
             {error && (
               <div className="mb-4 p-4 bg-destructive/10 text-destructive rounded-lg">
                 <p className="font-medium">Error loading items</p>

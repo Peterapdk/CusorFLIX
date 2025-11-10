@@ -91,7 +91,9 @@ async function getCollections(): Promise<Collection[]> {
   }
 }
 
-export default async function DiscoveryPage() {
+export default async function DiscoveryPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
+  const params = await searchParams;
+  const searchQuery = params.q?.trim() || '';
   const userId = await getOrCreateDemoUser();
   const watchlistIds = await getWatchlistIds(userId);
   
@@ -105,6 +107,7 @@ export default async function DiscoveryPage() {
       tvShows={[]} // Empty array - client will fetch via API route
       collections={collections}
       watchlistIds={watchlistIds}
+      searchQuery={searchQuery}
     />
   );
 }

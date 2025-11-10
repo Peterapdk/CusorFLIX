@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import DiscoverySection from './components/DiscoverySection';
 import type { TMDBMovie, TMDBTVShow } from '@/types/tmdb';
 
@@ -16,30 +16,60 @@ interface DiscoveryPageClientProps {
   tvShows: TMDBTVShow[];
   collections: Collection[];
   watchlistIds: number[];
+  searchQuery?: string;
 }
 
 export default function DiscoveryPageClient({ 
   movies, 
   tvShows,
   collections,
-  watchlistIds
+  watchlistIds,
+  searchQuery: initialSearchQuery
 }: DiscoveryPageClientProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const searchQuery = searchParams.get('q') || initialSearchQuery || '';
 
   const handleWatchlistToggle = async (id: number) => {
     // Refresh the page to update watchlist after toggle
     router.refresh();
   };
 
+  const handleSearchSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const query = formData.get('q')?.toString().trim() || '';
+    if (query) {
+      router.push(`/discovery?q=${encodeURIComponent(query)}`);
+    } else {
+      router.push('/discovery');
+    }
+  };
+
   return (
     <main className="min-h-screen bg-background pt-24 px-6">
       <div className="container mx-auto max-w-6xl space-y-12">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="space-y-1">
-            <h1 className="text-3xl font-bold text-foreground">Discovery</h1>
-            <p className="text-muted-foreground">Discover movies and TV shows with filters and sorting</p>
-          </div>
+        {/* Search Form */}
+        <div className="max-w-2xl mx-auto">
+          <form action="/discovery" onSubmit={handleSearchSubmit} className="relative">
+            <div className="relative">
+              <input
+                type="text"
+                name="q"
+                defaultValue={searchQuery}
+                placeholder="Search for movies, TV shows, actors..."
+                className="w-full bg-card border border-border rounded-lg px-6 py-4 pr-12 text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+              />
+              <button
+                type="submit"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 p-2 text-muted-foreground hover:text-cinema-orange transition-colors"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </button>
+            </div>
+          </form>
         </div>
 
         {/* Discovery Section */}
@@ -49,6 +79,7 @@ export default function DiscoveryPageClient({
           collections={collections}
           watchlistIds={watchlistIds}
           onWatchlistToggle={handleWatchlistToggle}
+          searchQuery={searchQuery}
         />
       </div>
     </main>

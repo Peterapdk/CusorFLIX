@@ -10,7 +10,6 @@ export default function Navbar() {
 
   const navItems: Array<{ href: Route; label: string }> = [
     { href: '/', label: 'Home' },
-    { href: '/search', label: 'Search' },
     { href: '/discovery', label: 'Discover' },
     { href: '/library', label: 'Library' },
     { href: '/settings', label: 'Settings' },
@@ -52,7 +51,7 @@ export default function Navbar() {
 
               {/* Search Button */}
               <Link
-                href="/search"
+                href="/discovery"
                 aria-label="Search movies and TV shows"
                 className="p-2 text-cinema-white-muted hover:text-cinema-orange transition-colors"
               >

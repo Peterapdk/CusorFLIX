@@ -95,7 +95,7 @@ export default function CustomListsSection({ lists }: CustomListsSectionProps) {
               <div className="text-center py-8 border border-border rounded-lg">
                 <p className="text-muted-foreground">No items in this list</p>
                 <Link
-                  href="/search"
+                  href="/discovery"
                   className="mt-4 inline-block px-4 py-2 text-sm text-primary hover:underline"
                 >
                   Browse content to add items
