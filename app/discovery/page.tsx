@@ -56,11 +56,17 @@ async function getChristmasCollection(): Promise<(TMDBMovie | TMDBTVShow)[]> {
       tmdbEnhanced.getMovieDetails(id)
         .then(movie => ({ ...movie, media_type: 'movie' as const }))
         .catch((error) => {
-          logger.warn('Error fetching Christmas movie', { 
-            context: 'DiscoveryPage', 
-            id,
-            error: error instanceof Error ? error : new Error(String(error))
-          });
+          // Only log non-404 errors as warnings (404s are expected for removed items)
+          const is404 = error instanceof Error && 'status' in error && (error as any).status === 404;
+          if (is404) {
+            logger.debug('Christmas movie not found (404)', { context: 'DiscoveryPage', id });
+          } else {
+            logger.warn('Error fetching Christmas movie', { 
+              context: 'DiscoveryPage', 
+              id,
+              error: error instanceof Error ? error : new Error(String(error))
+            });
+          }
           return null;
         })
     );
@@ -70,11 +76,16 @@ async function getChristmasCollection(): Promise<(TMDBMovie | TMDBTVShow)[]> {
       tmdbEnhanced.getMovieDetails(id)
         .then(movie => ({ ...movie, media_type: 'movie' as const }))
         .catch((error) => {
-          logger.warn('Error fetching Christmas Danish movie', { 
-            context: 'DiscoveryPage', 
-            id,
-            error: error instanceof Error ? error : new Error(String(error))
-          });
+          const is404 = error instanceof Error && 'status' in error && (error as any).status === 404;
+          if (is404) {
+            logger.debug('Christmas Danish movie not found (404)', { context: 'DiscoveryPage', id });
+          } else {
+            logger.warn('Error fetching Christmas Danish movie', { 
+              context: 'DiscoveryPage', 
+              id,
+              error: error instanceof Error ? error : new Error(String(error))
+            });
+          }
           return null;
         })
     );
@@ -84,11 +95,16 @@ async function getChristmasCollection(): Promise<(TMDBMovie | TMDBTVShow)[]> {
       tmdbEnhanced.getTVDetails(id)
         .then(tv => ({ ...tv, media_type: 'tv' as const }))
         .catch((error) => {
-          logger.warn('Error fetching Christmas Danish TV show', { 
-            context: 'DiscoveryPage', 
-            id,
-            error: error instanceof Error ? error : new Error(String(error))
-          });
+          const is404 = error instanceof Error && 'status' in error && (error as any).status === 404;
+          if (is404) {
+            logger.debug('Christmas Danish TV show not found (404)', { context: 'DiscoveryPage', id });
+          } else {
+            logger.warn('Error fetching Christmas Danish TV show', { 
+              context: 'DiscoveryPage', 
+              id,
+              error: error instanceof Error ? error : new Error(String(error))
+            });
+          }
           return null;
         })
     );

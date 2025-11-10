@@ -50,7 +50,7 @@ function toEnrichedItem(item: TMDBMovie | TMDBTVShow): EnrichedLibraryItem {
   }
 }
 
-const ITEMS_PER_PAGE = 20;
+const ITEMS_PER_PAGE = 100; // Show more items initially for collections
 
 export default function CollectionsSection({
   collections,
@@ -93,12 +93,13 @@ export default function CollectionsSection({
   // Get initial visible count for a collection (derived, not state)
   const getInitialCount = useCallback((collectionId: string, filteredCount: number) => {
     // If we already have an expanded count, use it (capped at filtered count)
-    // Otherwise, start with ITEMS_PER_PAGE
+    // Otherwise, show all items for collections (they're curated lists)
     const existing = expandedCounts[collectionId];
     if (existing !== undefined) {
       return Math.min(existing, filteredCount);
     }
-    return Math.min(ITEMS_PER_PAGE, filteredCount);
+    // Show all items for collections (no pagination needed for curated lists)
+    return filteredCount;
   }, [expandedCounts]);
 
   // Infinite scroll for each collection
