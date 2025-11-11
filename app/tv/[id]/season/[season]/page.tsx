@@ -2,6 +2,7 @@ import { tmdbEnhanced } from '@/lib/tmdb-enhanced';
 import Image from 'next/image';
 import Link from 'next/link';
 import type { TMDBSeasonDetails } from '@/types/tmdb';
+import logger from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,8 +12,23 @@ export default async function TVSeasonPage(props: { params: Promise<{ id: string
 
   // Fetch TV show basic info (name/backdrop) and the specific season details (with caching)
   const [tv, seasonDetails] = await Promise.all([
-    tmdbEnhanced.getTVDetails(id).catch(() => null),
-    tmdbEnhanced.getTVSeason(id, seasonNum).catch(() => null)
+    tmdbEnhanced.getTVDetails(id).catch((error) => {
+      logger.error('Error fetching TV details for season page', { 
+        context: 'TVSeasonPage', 
+        id,
+        error: error instanceof Error ? error : new Error(String(error))
+      });
+      return null;
+    }),
+    tmdbEnhanced.getTVSeason(id, seasonNum).catch((error) => {
+      logger.error('Error fetching season details', { 
+        context: 'TVSeasonPage', 
+        id,
+        season: seasonNum,
+        error: error instanceof Error ? error : new Error(String(error))
+      });
+      return null;
+    })
   ]);
 
   if (!tv || !seasonDetails) {

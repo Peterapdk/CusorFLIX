@@ -1,22 +1,23 @@
 import { Redis } from '@upstash/redis';
 import logger from '@/lib/logger';
+import { getEnvConfig } from '@/lib/env';
 
 // Initialize Redis client with graceful degradation
 let redis: Redis | null = null;
 
 try {
-  const redisUrl = process.env.UPSTASH_REDIS_REST_URL;
-  const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN;
-
-  if (redisUrl && redisToken) {
+  const envConfig = getEnvConfig();
+  
+  if (envConfig.redis) {
     redis = new Redis({
-      url: redisUrl,
-      token: redisToken,
+      url: envConfig.redis.url,
+      token: envConfig.redis.token,
     });
     logger.info('Redis cache initialized', { context: 'CacheManager' });
   } else {
     logger.warn('Redis cache not configured - UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN required', {
       context: 'CacheManager',
+      note: 'Features will work with graceful degradation (no caching)',
     });
   }
 } catch (error) {

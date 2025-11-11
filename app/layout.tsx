@@ -4,6 +4,8 @@ import './globals.css';
 import Navbar from '@/components/Navbar';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import { ThemeProvider } from '@/components/theme-provider';
+import PerformanceMonitorClient from '@/components/PerformanceMonitorClient';
+import '@/lib/env-init'; // Validate environment variables on startup
 
 const inter = Inter({
   subsets: ['latin'],
@@ -45,6 +47,7 @@ export default function RootLayout({
             Skip to main content
           </a>
           <ErrorBoundary>
+            <PerformanceMonitorClient />
             <Navbar />
             <main id="main-content" className="relative">
               {children}

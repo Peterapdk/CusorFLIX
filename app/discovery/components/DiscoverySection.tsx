@@ -99,8 +99,21 @@ export default function DiscoverySection({
         const response = await fetch(`/api/search?${params.toString()}`);
         
         if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          throw new Error(errorData.error || `HTTP ${response.status}`);
+          const errorData = await response.json().catch((error) => {
+            logger.error('Error parsing search API error response', { 
+              context: 'DiscoverySection', 
+              status: response.status,
+              error: error instanceof Error ? error : new Error(String(error))
+            });
+            return {};
+          });
+          const errorMessage = errorData.error || `HTTP ${response.status}`;
+          logger.error('Search API request failed', { 
+            context: 'DiscoverySection', 
+            status: response.status,
+            error: errorMessage
+          });
+          throw new Error(errorMessage);
         }
 
         const searchData = await response.json();
@@ -133,8 +146,21 @@ export default function DiscoverySection({
         const response = await fetch(`/api/discover?${params.toString()}`);
         
         if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          throw new Error(errorData.error || `HTTP ${response.status}`);
+          const errorData = await response.json().catch((error) => {
+            logger.error('Error parsing discover API error response', { 
+              context: 'DiscoverySection', 
+              status: response.status,
+              error: error instanceof Error ? error : new Error(String(error))
+            });
+            return {};
+          });
+          const errorMessage = errorData.error || `HTTP ${response.status}`;
+          logger.error('Discover API request failed', { 
+            context: 'DiscoverySection', 
+            status: response.status,
+            error: errorMessage
+          });
+          throw new Error(errorMessage);
         }
 
         data = await response.json();
