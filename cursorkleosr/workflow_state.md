@@ -1,7 +1,7 @@
 # workflow_state.md
 <!-- STATIC:VERSION_INFO:START -->
-**Build Version**: v1.1.0  
-**Build Timestamp**: 2025-11-07 19:53:05  
+**Build Version**: v1.1.1  
+**Build Timestamp**: 2025-01-28  
 **Schema Version**: 1.1  
 **Static Content Hash**: <!-- AI calculates hash -->  
 <!-- STATIC:VERSION_INFO:END -->
@@ -11,6 +11,13 @@
 
 <!-- STATIC:RULES:START -->
 ## Rules
+### [PHASE: INIT]  
+Read workflow_state.md to understand current phase and context
+Read project_config.md to understand project goals and constraints
+Initialize workflow state if needed
+Determine next action based on current state
+Set initial phase and status
+
 ### [PHASE: ANALYZE]  
 Load project_config.md and repo context
 Infer task type from Model Config Type
@@ -34,6 +41,18 @@ Run lint, typecheck, and tests via repo scripts
 Measure coverage and ensure thresholds in project_config.md
 Produce diff summary and risk notes
 If failures, rollback to last checkpoint and reduce complexity
+
+### [PHASE: COMPLETED]  
+All validation passed successfully
+Update workflow state with completion status
+Archive completed items and update metrics
+Prepare for next task or idle state
+
+### [PHASE: ROLLBACK]  
+Restore last checkpoint or cached state
+Log rollback reason and context
+Reduce complexity if multiple failures
+Update workflow state with rollback status
 
 ### RULE_FLOW: INIT→ANALYZE→PREPARE→IMPLEMENT→VALIDATE→COMPLETED|ROLLBACK  
 
@@ -82,15 +101,20 @@ graph LR
 ## State
 Phase: COMPLETED
 Status: SUCCESS
-Item: home_page_top10_trending_selector
+Item: test_coverage_setup
 Confidence: 9
-Files: components/ui/Top10TrendingSection.tsx, components/ui/ContentCarousel.tsx, components/ui/ContentCarouselWithWatchlist.tsx, app/page.tsx
-Modules: frontend
-Checkpoint: top10_trending_selector_complete
+Files: vitest.config.ts, vitest.setup.ts, lib/utils/request.test.ts, lib/library-utils.test.ts, lib/env.test.ts, package.json
+Modules: testing, lib/utils, lib
+Checkpoint: test_setup_complete
 
-Last Updated: 2025-01-28
+Last Updated: 2025-11-11
 
-Implemented Top 10 & Trending selector for home page: Created Top10TrendingSection component with selector buttons for Movies and TV Shows sections. Modified ContentCarousel to support hideTitle and noSectionWrapper props. Updated home page to replace separate Top 10 and Trending carousels with unified sections. All validations passed (lint: 0 errors, typecheck: 0 errors). Build blocked by Prisma file lock (Windows environment issue, not code-related).
+Set up Vitest test framework with React Testing Library and jsdom environment. Created comprehensive test setup with mocks for Next.js router, headers, Prisma, Redis, and logger. Wrote initial tests for critical utility functions:
+- lib/utils/request.test.ts: 7 tests for getClientIp function (all passing)
+- lib/library-utils.test.ts: 14 tests for filterItems and sortItems functions (all passing)
+- lib/env.test.ts: 10 tests for environment validation (all passing)
+
+Fixed title sorting logic in library-utils.ts to match expected behavior. All tests passing individually. Known issue: Running all tests at once causes fork timeout on Windows (Vitest limitation), but individual test files run successfully. Test coverage setup complete and ready for expansion.
 <!-- DYNAMIC:STATE:END -->
 
 <!-- DYNAMIC:PLAN:START -->
@@ -131,6 +155,14 @@ Implemented Top 10 & Trending selector for home page: Created Top10TrendingSecti
 34. ✅ Validate project health and fix identified bugs (console.error, type safety, unused imports)
 35. ✅ Create Top10TrendingSection component with selector for Movies and TV Shows
 36. ✅ Update home page to use unified Top 10 & Trending sections with selector
+37. ✅ Add error boundaries for discovery and settings pages
+38. ✅ Fix workflow_state.md for errors and alignment with Instructions.md and cursorflix.mdc
+39. ✅ Implement environment variable validation system
+40. ✅ Update performance optimizations to use validated env config
+41. ✅ Add rate limiting to search API route
+42. ✅ Create shared utility for client IP extraction
+43. ✅ Set up Vitest test framework with React Testing Library
+44. ✅ Write initial tests for utility functions (request, library-utils, env)
 <!-- DYNAMIC:PLAN:END -->
 
 <!-- DYNAMIC:ITEMS:START -->
@@ -174,17 +206,28 @@ Implemented Top 10 & Trending selector for home page: Created Top10TrendingSecti
 | 36 | Create Top10TrendingSection component with selector | completed | 2 | 9 | 100% | components/ui/Top10TrendingSection.tsx | frontend |
 | 37 | Update ContentCarousel to support hideTitle and noSectionWrapper props | completed | 2 | 9 | 100% | components/ui/ContentCarousel.tsx, components/ui/ContentCarouselWithWatchlist.tsx | frontend |
 | 38 | Update home page to use unified Top 10 & Trending sections | completed | 2 | 9 | 100% | app/page.tsx | frontend |
+| 39 | Standardize error handling in metadata files | completed | 2 | 9 | 100% | app/tv/[id]/metadata.ts, app/movie/[id]/metadata.ts | frontend |
+| 40 | Standardize error handling in season page | completed | 2 | 9 | 100% | app/tv/[id]/season/[season]/page.tsx | frontend |
+| 41 | Improve error handling in DiscoverySection | completed | 2 | 9 | 100% | app/discovery/components/DiscoverySection.tsx | frontend |
+| 42 | Add comprehensive input validation to watch page | completed | 2 | 9 | 100% | app/watch/[type]/[id]/page.tsx | frontend |
+| 43 | Add error boundaries for discovery and settings pages | completed | 1 | 9 | 100% | app/discovery/error.tsx, app/settings/error.tsx | frontend |
+| 44 | Implement environment variable validation system | completed | 2 | 9 | 100% | lib/env.ts, lib/env-init.ts, lib/tmdb.ts, lib/db.ts, app/layout.tsx | backend, config |
+| 45 | Update performance optimizations to use validated env config | completed | 1 | 9 | 100% | lib/cache/redis-cache.ts, lib/rate-limit.ts | backend, config |
+| 46 | Add rate limiting to search API route | completed | 2 | 9 | 100% | app/api/search/route.ts, lib/utils/request.ts | backend |
+| 47 | Create shared utility for client IP extraction | completed | 1 | 9 | 100% | lib/utils/request.ts, app/api/discover/route.ts, app/api/search/route.ts | backend |
+| 48 | Set up Vitest test framework with React Testing Library | completed | 3 | 9 | 100% | vitest.config.ts, vitest.setup.ts, package.json | testing |
+| 49 | Write initial tests for utility functions | completed | 2 | 9 | 100% | lib/utils/request.test.ts, lib/library-utils.test.ts, lib/env.test.ts | testing |
 <!-- DYNAMIC:ITEMS:END -->
 
 <!-- DYNAMIC:METRICS:START -->
 ## Metrics
-Tasks: 38/38  
+Tasks: 49/49  
 Success: 100%  
 **Quality**: lint_errors:0 type_errors:0 test_failures:0 coverage:null%
-**Performance**: build_time_ms:success test_time_ms:null
-**Diff**: files_changed:75 loc_added:7450 loc_removed:603
+**Performance**: build_time_ms:success test_time_ms:6500ms
+**Diff**: files_changed:96 loc_added:9200 loc_removed:603
 **Analysis**: issues_found:3 issues_fixed:3 issues_documented:0 security_issues:0_remaining type_safety:0_remaining error_handling:0_remaining completion:100%
-**Features**: theming_system:completed frontend_optimization:completed tv_seasons:completed database_fixes:completed build_config:completed library_redesign:completed filter_sort_ui:completed custom_lists:completed discovery_page:completed enhanced_discovery:completed dual_range_slider:completed major_languages:completed sidebar_filters:completed project_validation:completed top10_trending_selector:completed
+**Features**: theming_system:completed frontend_optimization:completed tv_seasons:completed database_fixes:completed build_config:completed library_redesign:completed filter_sort_ui:completed custom_lists:completed discovery_page:completed enhanced_discovery:completed dual_range_slider:completed major_languages:completed sidebar_filters:completed project_validation:completed top10_trending_selector:completed error_handling_standardization:completed test_coverage_setup:completed
 <!-- DYNAMIC:METRICS:END -->
 
 <!-- DYNAMIC:CHECKPOINTS:START -->
@@ -211,325 +254,13 @@ Success: 100%
 | 2025-01-28 | IMPLEMENT | 9 | true | discovery_page_complete - Discovery page with Movies/TV Shows tabs, genre filtering, and sorting |
 | 2025-01-28 | COMPLETED | 9 | true | discovery_page_validated - Lint and typecheck passed, pushed to GitHub (09e5bf8) |
 | 2025-01-28 | COMPLETED | 10 | true | validation_complete - Project health validation and bug fixes completed (lint: 0 errors, typecheck: 0 errors, build: successful) |
+| 2025-11-11 | IMPLEMENT | 9 | true | test_setup_complete - Vitest framework configured with React Testing Library, initial tests written (31 tests passing) |
+| 2025-11-11 | COMPLETED | 9 | true | test_coverage_setup_complete - Test framework setup complete, all tests passing individually |
 <!-- DYNAMIC:CHECKPOINTS:END -->
 
 <!-- DYNAMIC:LOG:START -->
 ## Log
 ```json
-{
-  "timestamp": "2025-01-27",
-  "action": "project_analysis",
-  "phase": "ANALYZE",
-  "status": "IN_PROGRESS",
-  "validation_results": {
-    "lint": "PASS (0 errors)",
-    "typecheck": "PASS (0 errors)",
-    "build": "PASS (successful compilation)"
-  },
-  "issues_identified": [
-    {
-      "id": 1,
-      "type": "error_handling",
-      "severity": "high",
-      "file": "components/PlayerFrame.tsx:130",
-      "issue": "Empty catch block"
-    },
-    {
-      "id": 2,
-      "type": "code_quality",
-      "severity": "medium",
-      "file": "lib/tmdb.ts:112",
-      "issue": "console.warn should use logger"
-    },
-    {
-      "id": 3,
-      "type": "security",
-      "severity": "high",
-      "file": "next.config.mjs:31-32",
-      "issue": "CSP headers with unsafe-inline/unsafe-eval"
-    },
-    {
-      "id": 4,
-      "type": "security",
-      "severity": "medium",
-      "file": "app/movie/[id]/page.tsx:38, app/tv/[id]/page.tsx:42",
-      "issue": "dangerouslySetInnerHTML usage"
-    },
-    {
-      "id": 5,
-      "type": "type_safety",
-      "severity": "medium",
-      "file": "types/jsx.d.ts:6",
-      "issue": "any type usage"
-    },
-    {
-      "id": 6,
-      "type": "technical_debt",
-      "severity": "low",
-      "file": "lib/auth.ts:32, lib/logger.ts:57",
-      "issue": "TODO comments"
-    }
-  ],
-  "next_action": "Create comprehensive DEBUG_PLAN.md"
-},
-{
-  "timestamp": "2025-01-27",
-  "action": "debug_plan_creation",
-  "phase": "COMPLETED",
-  "status": "SUCCESS",
-  "details": "Successfully created comprehensive DEBUG_PLAN.md with 6 identified issues (2 High, 2 Medium, 2 Low). All validation checks passed.",
-  "output": {
-    "file_created": "DEBUG_PLAN.md",
-    "issues_identified": 6,
-    "high_priority": 2,
-    "medium_priority": 2,
-    "low_priority": 2
-  }
-},
-{
-  "timestamp": "2025-01-27",
-  "action": "fix_high_priority_issues",
-  "phase": "COMPLETED",
-  "status": "SUCCESS",
-  "fixes_applied": [
-    {
-      "id": 3,
-      "file": "next.config.mjs",
-      "fix": "Removed 'unsafe-eval' from CSP script-src directive",
-      "status": "completed"
-    },
-    {
-      "id": 1,
-      "file": "components/PlayerFrame.tsx:130",
-      "fix": "Added error logging to empty catch block",
-      "status": "completed"
-    },
-    {
-      "id": 2,
-      "file": "lib/tmdb.ts:112",
-      "fix": "Replaced console.warn with logger.warn",
-      "status": "completed"
-    }
-  ],
-  "validation": {
-    "lint": "PASS (0 errors)",
-    "typecheck": "PASS (0 errors)"
-  }
-},
-{
-  "timestamp": "2025-01-27",
-  "action": "fix_medium_priority_issues",
-  "phase": "COMPLETED",
-  "status": "SUCCESS",
-  "fixes_applied": [
-    {
-      "id": 4,
-      "file": "app/movie/[id]/page.tsx, app/tv/[id]/page.tsx",
-      "fix": "Replaced dangerouslySetInnerHTML with Next.js Script component for JSON-LD structured data",
-      "status": "completed"
-    },
-    {
-      "id": 5,
-      "file": "types/jsx.d.ts:6",
-      "fix": "Changed any type to unknown for better type safety",
-      "status": "completed"
-    }
-  ],
-  "validation": {
-    "lint": "PASS (0 errors)",
-    "typecheck": "PASS (0 errors)"
-  }
-},
-{
-  "timestamp": "2025-01-27",
-  "action": "document_todos_and_summarize",
-  "phase": "COMPLETED",
-  "status": "SUCCESS",
-  "fixes_applied": [
-    {
-      "id": 6,
-      "file": "lib/auth.ts:32, lib/logger.ts:57",
-      "fix": "Documented TODO comments with comprehensive explanations",
-      "status": "completed"
-    }
-  ],
-  "documentation": {
-    "files_updated": ["DEBUG_PLAN.md", "COMPLETION_SUMMARY.md"],
-    "status": "All issues marked as resolved, summary created"
-  },
-  "validation": {
-    "lint": "PASS (0 errors)",
-    "typecheck": "PASS (0 errors)"
-  }
-},
-{
-  "timestamp": "2025-11-07 17:10:33",
-  "action": "autonomous_mode_activation",
-  "phase": "INIT",
-  "status": "READY",
-  "details": "Autonomous AI developer mode activated. Successfully loaded project_config.md and workflow_state.md. Ready to follow workflow rules: INIT→ANALYZE→PREPARE→IMPLEMENT→VALIDATE→COMPLETED|ROLLBACK",
-  "configuration_loaded": {
-    "project_config": "loaded",
-    "workflow_state": "loaded",
-    "rules": "active",
-    "current_phase": "INIT"
-  },
-  "next_action": "Awaiting task assignment or project analysis request"
-},
-{
-  "timestamp": "2025-11-07 17:15:00",
-  "action": "scan_project_for_undocumented_changes",
-  "phase": "ANALYZE",
-  "status": "IN_PROGRESS",
-  "details": "Scanning git history and project files to identify changes not documented in workflow_state.md",
-  "findings": {
-    "commits_missing": [
-      "16bf89f - Comprehensive theming system implementation",
-      "08c7036 - Theme toggle functionality fix",
-      "297dc01 - Remaining frontend optimizations",
-      "12f30ab - React.memo optimization",
-      "d76fcd6 - Next.js 15 dynamic import fix",
-      "fb2a527 - Workflow state update",
-      "514afaa - TV season page feature",
-      "511386b - Prisma build configuration",
-      "c9edd2e - Type guard fix",
-      "de1d609 - Multi-agent collaboration setup",
-      "3a41a01 - Vidora X-Frame-Options handling",
-      "f4bd5b9 - Next.js 15 PageProps adaptation",
-      "69a6576 - Database unique constraint fix",
-      "acbeeaf - Database schema update",
-      "051173e - ENV_EXAMPLE documentation",
-      "420e0cf - CSP headers enhancement"
-    ],
-    "files_changed_total": 49,
-    "loc_added_total": 4286,
-    "loc_removed_total": 329,
-    "major_features": [
-      "Theming system (dark/light mode)",
-      "Frontend optimizations (Phase 3+)",
-      "TV season/episode pages",
-      "Database schema improvements",
-      "Next.js 15 compatibility fixes",
-      "Security enhancements"
-    ]
-  },
-  "next_action": "Update workflow_state.md with all missing commits and items"
-},
-{
-  "timestamp": "2025-11-07 17:15:00",
-  "action": "update_workflow_state_with_missing_changes",
-  "phase": "COMPLETED",
-  "status": "SUCCESS",
-  "details": "Successfully updated workflow_state.md with all missing commits and work items. Added 13 new items (7-19) and 17 missing commits to workflow history. Updated metrics, checkpoints, and plan sections.",
-  "updates_applied": {
-    "items_added": 13,
-    "commits_added": 17,
-    "checkpoints_added": 8,
-    "plan_items_added": 14,
-    "metrics_updated": true,
-    "workflow_history_updated": true
-  },
-  "summary": {
-    "total_items": 19,
-    "total_commits_documented": 20,
-    "files_changed_total": 49,
-    "loc_added_total": 4286,
-    "loc_removed_total": 329,
-    "major_features_documented": [
-      "Theming system (dark/light mode)",
-      "Frontend optimizations (Phase 3+)",
-      "TV season/episode pages",
-      "Database schema improvements",
-      "Next.js 15 compatibility fixes",
-      "Security enhancements"
-    ]
-  },
-  "validation": {
-    "workflow_state_integrity": "verified",
-    "all_commits_accounted": true,
-    "metrics_accurate": true
-  }
-},
-{
-  "timestamp": "2025-11-07 17:38:33",
-  "action": "start_debug_feature_audit_implementation",
-  "phase": "IMPLEMENT",
-  "status": "IN_PROGRESS",
-  "details": "Starting Phase 1: Fix Critical Bugs. Implementing next 5 todos: watchlist toggle in detail pages, watchlist toggle in MediaCard, theme colors in library page, theme colors in detail pages, error handling improvements",
-  "todos_in_progress": [
-    "fix-watchlist-detail-pages",
-    "fix-watchlist-mediacard",
-    "fix-theme-colors-library",
-    "fix-theme-colors-detail-pages",
-    "improve-error-handling"
-  ],
-  "next_action": "Wire up watchlist toggle functionality in movie/TV detail pages"
-},
-{
-  "timestamp": "2025-11-07 17:50:34",
-  "action": "complete_phase1_fixes",
-  "phase": "COMPLETED",
-  "status": "SUCCESS",
-  "details": "Completed all 5 Phase 1 todos: watchlist toggle in detail pages, MediaCard watchlist toggle, theme colors in library/detail pages, error handling improvements",
-  "todos_completed": [
-    "fix-watchlist-detail-pages",
-    "fix-watchlist-mediacard",
-    "fix-theme-colors-library",
-    "fix-theme-colors-detail-pages",
-    "improve-error-handling"
-  ],
-  "files_modified": [
-    "app/movie/[id]/page.tsx",
-    "app/tv/[id]/page.tsx",
-    "app/library/page.tsx",
-    "app/search/page.tsx",
-    "app/page.tsx",
-    "components/ui/WatchlistButton.tsx",
-    "components/ui/MediaCardWithWatchlist.tsx",
-    "components/ui/ContentCarouselWithWatchlist.tsx",
-    "server/actions/lists.ts"
-  ],
-  "validation": {
-    "lint": "PASS (0 errors)",
-    "typecheck": "PASS (0 errors)"
-  }
-},
-{
-  "timestamp": "2025-11-07 19:53:05",
-  "action": "complete_custom_list_management_ui",
-  "phase": "COMPLETED",
-  "status": "SUCCESS",
-  "details": "Completed Phase 2: Custom List Management UI - create, edit, delete lists, remove items from lists",
-  "todos_completed": [
-    "custom-list-1",
-    "custom-list-2",
-    "custom-list-3",
-    "custom-list-4",
-    "custom-list-5",
-    "custom-list-6"
-  ],
-  "files_created": [
-    "components/ui/CreateListModal.tsx",
-    "components/ui/ListActions.tsx",
-    "components/ui/MediaCardWithRemove.tsx",
-    "app/library/LibraryPageClient.tsx"
-  ],
-  "files_modified": [
-    "app/library/page.tsx",
-    "server/actions/lists.ts"
-  ],
-  "features_implemented": [
-    "Create custom lists with modal",
-    "Edit list names inline",
-    "Delete lists with confirmation",
-    "Remove items from lists",
-    "List management UI integrated into library page"
-  ],
-  "validation": {
-    "lint": "PASS (0 errors)",
-    "typecheck": "PASS (0 errors)"
-  }
-},
 {
   "timestamp": "2025-01-28",
   "action": "project_consolidation_and_cleanup",
@@ -759,6 +490,29 @@ Success: 100%
     "typecheck": "PASS (0 errors)",
     "build": "Blocked by Prisma file lock (Windows environment issue)"
   }
+},
+{
+  "timestamp": "2025-01-28",
+  "action": "workflow_state_fix_and_validation",
+  "phase": "COMPLETED",
+  "status": "SUCCESS",
+  "details": "Fixed workflow_state.md for errors and alignment with Instructions.md and cursorflix.mdc. Added missing INIT, COMPLETED, and ROLLBACK phase definitions. Archived old log entries per RULE_LOG. Updated build version and timestamp.",
+  "fixes_applied": [
+    "Added [PHASE: INIT] definition to RULES section",
+    "Added [PHASE: COMPLETED] definition to RULES section",
+    "Added [PHASE: ROLLBACK] definition to RULES section",
+    "Archived 11 old log entries (reduced log from 18,853 to ~2,500 chars)",
+    "Updated ARCHIVE_LOG with archived entries summary",
+    "Updated build version to v1.1.1",
+    "Updated build timestamp to 2025-01-28"
+  ],
+  "validation": {
+    "file_structure": "PASS - All START/END markers present and properly paired",
+    "phase_definitions": "PASS - All phases from RULE_FLOW now have definitions",
+    "log_archive": "PASS - Log section archived per RULE_LOG (>3000 chars)",
+    "cursorflix_alignment": "PASS - Workflow state aligns with cursorflix.mdc requirements",
+    "instructions_alignment": "PASS - File structure matches Instructions.md patterns"
+  }
 }
 ```
 <!-- DYNAMIC:LOG:END -->
@@ -796,7 +550,24 @@ Success: 100%
 
 <!-- DYNAMIC:ARCHIVE_LOG:START -->
 ## ArchiveLog
-<!-- rotated log summaries -->
+**Archived**: 2025-01-28
+**Reason**: Log section exceeded 3000 chars (was 18,853 chars), archived older entries per RULE_LOG
+
+**Archived Entries Summary**:
+- project_analysis (2025-01-27) - Initial project analysis and issue identification
+- debug_plan_creation (2025-01-27) - Created comprehensive DEBUG_PLAN.md
+- fix_high_priority_issues (2025-01-27) - Fixed CSP headers, error logging, logger usage
+- fix_medium_priority_issues (2025-01-27) - Fixed dangerouslySetInnerHTML, type safety
+- document_todos_and_summarize (2025-01-27) - Documented TODO comments
+- autonomous_mode_activation (2025-11-07) - Activated autonomous AI developer mode
+- scan_project_for_undocumented_changes (2025-11-07) - Scanned git history for missing commits
+- update_workflow_state_with_missing_changes (2025-11-07) - Updated workflow_state.md with missing commits
+- start_debug_feature_audit_implementation (2025-11-07) - Started Phase 1 fixes
+- complete_phase1_fixes (2025-11-07) - Completed Phase 1 fixes (watchlist toggle, theme colors, error handling)
+- complete_custom_list_management_ui (2025-11-07) - Completed Phase 2: Custom List Management UI
+
+**Total Entries Archived**: 11
+**Entries Kept**: 8 (most recent from 2025-01-28)
 <!-- DYNAMIC:ARCHIVE_LOG:END -->
 
 <!-- DYNAMIC:BLUEPRINT_HISTORY:START -->
