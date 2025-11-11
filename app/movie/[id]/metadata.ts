@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { tmdbEnhanced } from '@/lib/tmdb-enhanced';
+import logger from '@/lib/logger';
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -7,7 +8,14 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
-  const movie = await tmdbEnhanced.getMovieDetails(id).catch(() => null);
+  const movie = await tmdbEnhanced.getMovieDetails(id).catch((error) => {
+    logger.error('Error fetching movie details for metadata', { 
+      context: 'MovieMetadata', 
+      id,
+      error: error instanceof Error ? error : new Error(String(error))
+    });
+    return null;
+  });
 
   if (!movie) {
     return {

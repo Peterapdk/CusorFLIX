@@ -54,6 +54,10 @@ A modern movie and TV show library management application built with Next.js, TM
    - `DATABASE_URL`: Your PostgreSQL connection string
    - `NEXT_PUBLIC_TMDB_API_KEY`: Your TMDB API key
    - `TMDB_READ_ACCESS_TOKEN`: Your TMDB v4 access token (optional, but recommended)
+   - `UPSTASH_REDIS_REST_URL`: Your Upstash Redis URL (optional, for caching and rate limiting)
+   - `UPSTASH_REDIS_REST_TOKEN`: Your Upstash Redis token (optional, for caching and rate limiting)
+   
+   **Note:** Redis is optional. Features work without it, but with reduced functionality (no caching, rate limiting allows all requests). See [Redis Setup Guide](docs/REDIS_SETUP.md) for details.
 
 4. **Set up the database**
    
@@ -83,6 +87,10 @@ A modern movie and TV show library management application built with Next.js, TM
 - `npm run prisma:generate` - Generate Prisma Client
 - `npm run prisma:migrate` - Run database migrations
 - `npm run prisma:studio` - Open Prisma Studio (database GUI)
+- `npm run test:rate-limit` - Test rate limiting functionality
+- `npm run test:caching` - Test caching functionality
+- `npm run test:performance` - Show performance monitoring test instructions
+- `npm run test:optimizations` - Run all optimization tests
 
 ## Project Structure
 
@@ -128,9 +136,11 @@ The application uses Prisma with the following models:
 |----------|-------------|----------|
 | `DATABASE_URL` | PostgreSQL connection string | Yes |
 | `NEXT_PUBLIC_TMDB_API_KEY` | TMDB API v3 key | Yes |
-| `TMDB_READ_ACCESS_TOKEN` | TMDB API v4 access token | Recommended |
-| `NEXTAUTH_SECRET` | Secret for NextAuth (if using auth) | No |
-| `NEXTAUTH_URL` | Base URL for NextAuth | No |
+| `TMDB_READ_ACCESS_TOKEN` | TMDB API v4 access token | No (recommended) |
+| `UPSTASH_REDIS_REST_URL` | Upstash Redis REST URL | No (optional, for caching/rate limiting) |
+| `UPSTASH_REDIS_REST_TOKEN` | Upstash Redis REST token | No (optional, for caching/rate limiting) |
+
+See [Redis Setup Guide](docs/REDIS_SETUP.md) for Redis configuration instructions.
 
 ## Completed Features
 

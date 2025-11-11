@@ -3,6 +3,8 @@ import { tmdbEnhanced } from '@/lib/tmdb-enhanced';
 import { isMovie, isTVShow } from '@/types/tmdb';
 import type { MediaFilter, SortOption } from '@/types/library';
 import logger from '@/lib/logger';
+import { rateLimiter, type RateLimitRequest } from '@/lib/rate-limit';
+import { getClientIp } from '@/lib/utils/request';
 
 // Force dynamic rendering - no caching for discovery results
 export const dynamic = 'force-dynamic';
@@ -104,6 +106,48 @@ function convertFiltersToDiscoverOptions(
 
 export async function GET(request: NextRequest) {
   try {
+    // Apply rate limiting (TMDB discover API: 40 requests per minute)
+    const clientIp = getClientIp(request);
+    const rateLimitRequest: RateLimitRequest = {
+      identifier: clientIp,
+      endpoint: '/api/discover',
+    };
+
+    const rateLimitResult = await rateLimiter.checkLimit(rateLimitRequest, {
+      limit: 40,
+      window: 60, // 60 seconds = 1 minute
+      keyGenerator: (req) => `tmdb:discover:${req.identifier}`,
+      allowOnFailure: true, // Graceful degradation - allow on Redis failure
+    });
+
+    // If rate limit exceeded, return 429 with Retry-After header
+    if (!rateLimitResult.allowed) {
+      logger.warn('Rate limit exceeded for discover API', {
+        context: 'DiscoverAPI',
+        identifier: clientIp,
+        count: rateLimitResult.count,
+        limit: rateLimitResult.limit,
+        retryAfter: rateLimitResult.retryAfter,
+      });
+
+      return NextResponse.json(
+        {
+          error: 'Rate limit exceeded',
+          message: `Too many requests. Please try again in ${rateLimitResult.retryAfter} seconds.`,
+          retryAfter: rateLimitResult.retryAfter,
+        },
+        {
+          status: 429,
+          headers: {
+            'Retry-After': rateLimitResult.retryAfter.toString(),
+            'X-RateLimit-Limit': rateLimitResult.limit.toString(),
+            'X-RateLimit-Remaining': Math.max(0, rateLimitResult.limit - rateLimitResult.count).toString(),
+            'X-RateLimit-Reset': (Math.floor(Date.now() / 1000) + rateLimitResult.retryAfter).toString(),
+          },
+        }
+      );
+    }
+
     const searchParams = request.nextUrl.searchParams;
     const type = searchParams.get('type');
     const pageParam = searchParams.get('page');
@@ -157,12 +201,22 @@ export async function GET(request: NextRequest) {
       ? response.results.filter(isMovie)
       : response.results.filter(isTVShow);
 
-    return NextResponse.json({
-      results: items,
-      page: response.page,
-      total_pages: response.total_pages,
-      total_results: response.total_results,
-    });
+    // Return response with rate limit headers
+    return NextResponse.json(
+      {
+        results: items,
+        page: response.page,
+        total_pages: response.total_pages,
+        total_results: response.total_results,
+      },
+      {
+        headers: {
+          'X-RateLimit-Limit': rateLimitResult.limit.toString(),
+          'X-RateLimit-Remaining': Math.max(0, rateLimitResult.limit - rateLimitResult.count).toString(),
+          'X-RateLimit-Reset': (Math.floor(Date.now() / 1000) + rateLimitResult.resetTime).toString(),
+        },
+      }
+    );
   } catch (error) {
     logger.error('Error in discover API route', {
       context: 'DiscoverAPI',

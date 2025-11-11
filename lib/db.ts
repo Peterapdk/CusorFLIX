@@ -1,7 +1,14 @@
 import { PrismaClient } from '@prisma/client';
 import logger from '@/lib/logger';
+import { getEnvConfig } from './env';
 
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
+
+// Validate that DATABASE_URL is configured (validated via env.ts)
+const envConfig = getEnvConfig();
+if (!envConfig.databaseUrl) {
+  throw new Error('DATABASE_URL is required but not configured. Please check your environment variables.');
+}
 
 // Performance monitoring for slow queries
 const SLOW_QUERY_THRESHOLD_MS = 500;
@@ -9,7 +16,8 @@ const SLOW_QUERY_THRESHOLD_MS = 500;
 export const prisma =
   globalForPrisma.prisma ||
   new PrismaClient({
-    log: process.env.NODE_ENV === 'development' 
+    datasourceUrl: envConfig.databaseUrl,
+    log: envConfig.nodeEnv === 'development' 
       ? [
           {
             emit: 'event',
@@ -22,7 +30,7 @@ export const prisma =
   });
 
 // Development query logging and slow query detection
-if (process.env.NODE_ENV === 'development') {
+if (envConfig.nodeEnv === 'development') {
   prisma.$on('query' as never, (e: { query: string; params: string; duration: number; target: string }) => {
     const duration = e.duration;
     
@@ -52,7 +60,7 @@ prisma.$use(async (params: any, next: any) => {
   const after = Date.now();
   const duration = after - before;
 
-  if (duration > SLOW_QUERY_THRESHOLD_MS && process.env.NODE_ENV === 'production') {
+  if (duration > SLOW_QUERY_THRESHOLD_MS && envConfig.nodeEnv === 'production') {
     logger.warn('Slow query detected in production', {
       context: 'Prisma',
       duration: `${duration}ms`,
@@ -64,6 +72,6 @@ prisma.$use(async (params: any, next: any) => {
   return result;
 });
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
+if (envConfig.nodeEnv !== 'production') globalForPrisma.prisma = prisma;
 
 

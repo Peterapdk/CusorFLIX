@@ -13,3 +13,9 @@ DATABASE_URL=
 NEXTAUTH_SECRET=
 NEXTAUTH_URL=
 
+# Redis (Upstash) - Optional but recommended for caching and rate limiting
+# Get your Redis URL and token from: https://console.upstash.com/
+# If not configured, features will work with graceful degradation (no caching, rate limiting allows all requests)
+UPSTASH_REDIS_REST_URL=
+UPSTASH_REDIS_REST_TOKEN=
+

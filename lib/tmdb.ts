@@ -7,13 +7,15 @@ import type {
   MediaType as TMDBMediaType
 } from '@/types/tmdb';
 import logger from '@/lib/logger';
+import { getEnvConfig } from './env';
 
-const TMDB_BASE_URL = process.env.NEXT_PUBLIC_TMDB_BASE_URL?.trim() || 'https://api.themoviedb.org/3';
-const TMDB_V4_BASE_URL = process.env.NEXT_PUBLIC_TMDB_V4_BASE_URL?.trim() || 'https://api.themoviedb.org/4';
+// Get validated environment configuration
+const envConfig = getEnvConfig();
 
-// Trim whitespace from environment variables to prevent authentication errors
-const TMDB_API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY?.trim();
-const TMDB_READ_ACCESS_TOKEN = process.env.TMDB_READ_ACCESS_TOKEN?.trim();
+const TMDB_BASE_URL = envConfig.tmdb.baseUrl;
+const TMDB_V4_BASE_URL = envConfig.tmdb.v4BaseUrl;
+const TMDB_API_KEY = envConfig.tmdb.apiKey;
+const TMDB_READ_ACCESS_TOKEN = envConfig.tmdb.readAccessToken;
 
 type HttpMethod = 'GET' | 'POST' | 'DELETE';
 
@@ -65,17 +67,9 @@ async function tmdbFetch<T>(path: string, init?: { method?: HttpMethod; body?: u
 
   // Always use API key if READ_ACCESS_TOKEN is not available
   // This ensures we have authentication even if token is missing
+  // Note: Environment validation ensures at least one auth method is available
   if (!TMDB_READ_ACCESS_TOKEN && TMDB_API_KEY) {
     url.searchParams.set('api_key', TMDB_API_KEY);
-  }
-  
-  // Log authentication method for debugging (in non-production)
-  if (process.env.NODE_ENV !== 'production' && (!TMDB_READ_ACCESS_TOKEN && !TMDB_API_KEY)) {
-    logger.warn('TMDB API: No authentication credentials available', {
-      context: 'TMDB',
-      hasToken: !!TMDB_READ_ACCESS_TOKEN,
-      hasKey: !!TMDB_API_KEY,
-    });
   }
 
   // Retry loop with exponential backoff
