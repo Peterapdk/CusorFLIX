@@ -107,10 +107,10 @@ export function sortItems<T extends EnrichedLibraryItem>(
         break;
 
       case 'title':
-        // Sort alphabetically by title
+        // Sort alphabetically by title (reverse comparison to match descending default pattern)
         const titleA = (a.title || a.name || '').toLowerCase();
         const titleB = (b.title || b.name || '').toLowerCase();
-        comparison = titleA.localeCompare(titleB);
+        comparison = titleB.localeCompare(titleA); // Reverse for consistency with other sorts
         break;
 
       case 'popularity':
