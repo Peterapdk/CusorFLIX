@@ -1,0 +1,45 @@
+## Plan
+1. ✅ Analyze project structure and current state
+2. ✅ Run lint, typecheck, and build validation
+3. ✅ Scan for code quality issues (console statements, error handling, type safety)
+4. ✅ Check for security concerns (CSP, dangerouslySetInnerHTML)
+5. ✅ Review existing DEBUG_PLAN.md
+6. ✅ Create comprehensive updated debug plan
+7. ✅ Update workflow_state.md with findings
+8. ✅ Fix CSP headers (remove unsafe-eval, keep unsafe-inline for styles only)
+9. ✅ Add error logging to empty catch block in PlayerFrame.tsx
+10. ✅ Replace console.warn with logger in lib/tmdb.ts
+11. ✅ Validate all fixes (lint: PASS, typecheck: PASS)
+12. ✅ Replace dangerouslySetInnerHTML with Next.js Script component (movie/tv pages)
+13. ✅ Improve type safety in types/jsx.d.ts (any → unknown)
+14. ✅ Validate medium priority fixes (lint: PASS, typecheck: PASS)
+15. ✅ Address remaining TODO comments (documented)
+16. ✅ Update DEBUG_PLAN.md with completion status
+17. ✅ Create completion summary document
+18. ✅ Create frontend optimization plan
+19. ✅ Implement comprehensive theming system with dark/light mode
+20. ✅ Fix theme toggle functionality and integrate with settings page
+21. ✅ Implement frontend optimization Phase 3+ (React.memo, dynamic imports, API retry)
+22. ✅ Fix Next.js 15 dynamic import error in Server Component
+23. ✅ Add TV season page with episode list
+24. ✅ Configure Prisma build/postinstall for Vercel
+25. ✅ Fix type guard operator precedence
+26. ✅ Add multi-agent collaboration setup
+27. ✅ Handle Vidora X-Frame-Options with fallback
+28. ✅ Adapt Next.js 15 PageProps (params as Promise) for dynamic routes
+29. ✅ Fix database unique constraint issues for lists
+30. ✅ Add ENV_EXAMPLE documentation
+31. ✅ Enhance CSP headers for Vidora iframe and TMDB assets
+32. ✅ Scan project for undocumented changes and update workflow_state.md
+33. ✅ Create Discovery page with Movies/TV Shows tabs, genre filtering, and sorting
+34. ✅ Validate project health and fix identified bugs (console.error, type safety, unused imports)
+35. ✅ Create Top10TrendingSection component with selector for Movies and TV Shows
+36. ✅ Update home page to use unified Top 10 & Trending sections with selector
+37. ✅ Add error boundaries for discovery and settings pages
+38. ✅ Fix workflow_state.md for errors and alignment with Instructions.md and cursorflix.mdc
+39. ✅ Implement environment variable validation system
+40. ✅ Update performance optimizations to use validated env config
+41. ✅ Add rate limiting to search API route
+42. ✅ Create shared utility for client IP extraction
+43. ✅ Set up Vitest test framework with React Testing Library
+44. ✅ Write initial tests for utility functions (request, library-utils, env)

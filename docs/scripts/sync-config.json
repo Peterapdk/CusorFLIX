@@ -1,0 +1,25 @@
+{
+  "sync": {
+    "enabled": true,
+    "frequency": "on_demand",
+    "auto_commit": false,
+    "validation": "strict"
+  },
+  "logging": {
+    "level": "info",
+    "file": "sync-engine.log",
+    "max_size": "10MB",
+    "retention": "30d"
+  },
+  "transformers": {
+    "workflow_to_progress": true,
+    "workflow_to_context": true,
+    "decisions_to_log": true,
+    "metrics_to_product": true
+  },
+  "validation": {
+    "data_integrity": true,
+    "consistency_checks": true,
+    "conflict_resolution": "latest_wins"
+  }
+}

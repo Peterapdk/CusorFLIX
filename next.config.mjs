@@ -64,14 +64,16 @@ const nextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              "img-src 'self' https://image.tmdb.org data:",
-              "script-src 'self' 'unsafe-inline'",
-              "style-src 'self' 'unsafe-inline'",
+              "img-src 'self' https://image.tmdb.org data: blob:",
+              "script-src 'self'",
+              "style-src 'self' 'unsafe-inline'", // Keep for Next.js styled-jsx
               "frame-src https://cinemaos.tech",
               "frame-ancestors 'self'",
               "connect-src 'self' https://api.themoviedb.org",
               "base-uri 'self'",
-              "form-action 'self'"
+              "form-action 'self'",
+              "object-src 'none'",
+              "upgrade-insecure-requests"
             ].join('; '),
           },
           {

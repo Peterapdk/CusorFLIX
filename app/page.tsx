@@ -47,8 +47,7 @@ async function HeroContent() {
 }
 
 // Async component for movies with Top 10 & Trending selector
-async function MoviesSection() {
-  const userId = await getOrCreateDemoUser();
+async function MoviesSection(userId: string) {
   const watchlistIds = await getWatchlistIds(userId);
   
   const movies = await tmdbEnhanced.getTrending('movie', 'week').catch((error) => {
@@ -73,8 +72,7 @@ async function MoviesSection() {
 }
 
 // Async component for TV shows with Top 10 & Trending selector
-async function TVShowsSection() {
-  const userId = await getOrCreateDemoUser();
+async function TVShowsSection(userId: string) {
   const watchlistIds = await getWatchlistIds(userId);
   
   const tv = await tmdbEnhanced.getTrending('tv', 'week').catch((error) => {
@@ -98,7 +96,21 @@ async function TVShowsSection() {
   );
 }
 
-export default function HomePage() {
+// Main page component with shared user context
+async function HomePageContent() {
+  const userId = await getOrCreateDemoUser();
+  if (!userId) {
+    // Fallback for when user creation fails
+    return (
+      <main className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-foreground mb-4">Unable to load content</h1>
+          <p className="text-muted-foreground">Please try refreshing the page.</p>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main className="min-h-screen bg-background">
       {/* Hero Section with Suspense */}
@@ -109,13 +121,17 @@ export default function HomePage() {
       {/* Content Sections with Suspense */}
       <div className="relative z-10 -mt-32 space-y-8">
         <Suspense fallback={<CarouselSkeleton />}>
-          <MoviesSection />
+          {MoviesSection(userId)}
         </Suspense>
 
         <Suspense fallback={<CarouselSkeleton />}>
-          <TVShowsSection />
+          {TVShowsSection(userId)}
         </Suspense>
       </div>
     </main>
   );
+}
+
+export default function HomePage() {
+  return <HomePageContent />;
 }

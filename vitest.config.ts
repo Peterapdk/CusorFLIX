@@ -9,11 +9,6 @@ export default defineConfig({
     include: ['**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
     exclude: ['node_modules', '.next', 'dist', 'build', 'app/**', 'components/**'],
     pool: 'forks',
-    poolOptions: {
-      forks: {
-        singleFork: true,
-      },
-    },
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],

@@ -1,8 +1,10 @@
 'use client';
 
 import { useRouter, useSearchParams } from 'next/navigation';
-import DiscoverySection from './components/DiscoverySection';
+import { lazy, Suspense } from 'react';
 import type { TMDBMovie, TMDBTVShow } from '@/types/tmdb';
+
+const DiscoverySection = lazy(() => import('./components/DiscoverySection'));
 
 interface Collection {
   id: string;
@@ -73,14 +75,25 @@ export default function DiscoveryPageClient({
         </div>
 
         {/* Discovery Section */}
-        <DiscoverySection
-          movies={movies}
-          tvShows={tvShows}
-          collections={collections}
-          watchlistIds={watchlistIds}
-          onWatchlistToggle={handleWatchlistToggle}
-          searchQuery={searchQuery}
-        />
+        <Suspense fallback={
+          <div className="text-center py-16">
+            <div className="w-20 h-20 bg-card rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+              <svg className="w-10 h-10 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+            </div>
+            <p className="text-muted-foreground">Loading discovery...</p>
+          </div>
+        }>
+          <DiscoverySection
+            movies={movies}
+            tvShows={tvShows}
+            collections={collections}
+            watchlistIds={watchlistIds}
+            onWatchlistToggle={handleWatchlistToggle}
+            searchQuery={searchQuery}
+          />
+        </Suspense>
       </div>
     </main>
   );

@@ -8,7 +8,6 @@
  */
 
 // Set environment variables FIRST, before any imports
-process.env.NODE_ENV = 'test';
 process.env.DATABASE_URL = 'postgresql://test:test@localhost:5432/test';
 process.env.NEXT_PUBLIC_TMDB_API_KEY = 'test-api-key';
 process.env.NEXT_PUBLIC_TMDB_BASE_URL = 'https://api.themoviedb.org/3';

@@ -3,6 +3,24 @@ import { tmdbEnhanced } from '@/lib/tmdb-enhanced';
 import { isMovie, isTVShow } from '@/types/tmdb';
 import type { MediaFilter, SortOption } from '@/types/library';
 import logger from '@/lib/logger';
+import { applyRateLimit, createRateLimitResponse, rateLimiters } from '@/lib/rate-limit';
+import { z } from 'zod';
+
+// Validation schemas
+const discoverQuerySchema = z.object({
+  type: z.enum(['movie', 'tv']),
+  page: z.string().optional().transform(val => val ? parseInt(val, 10) : 1).refine(val => val > 0, 'Page must be positive'),
+  filters: z.string().optional().transform(val => {
+    if (!val) return {};
+    try {
+      return JSON.parse(val);
+    } catch {
+      throw new Error('Invalid filters JSON');
+    }
+  }),
+  sortOption: z.enum(['popularity', 'rating', 'release-date', 'title', 'date-added']).optional().default('popularity'),
+  sortDirection: z.enum(['asc', 'desc']).optional().default('desc'),
+});
 
 // Force dynamic rendering - no caching for discovery results
 export const dynamic = 'force-dynamic';
@@ -45,8 +63,8 @@ function convertFiltersToDiscoverOptions(
 
   // Languages: Direct language codes (multi-select)
   // Note: TMDB API only supports single language per request
-  // If multiple languages selected, we use the first one
-  // TODO: Could make multiple API calls and merge results for better multi-language support
+  // If multiple languages selected, we use the first one (preferring common languages)
+  // Future enhancement: Could make multiple API calls and merge results for better multi-language support
   if (filters.languages && filters.languages.length > 0) {
     // TMDB only supports single language, use first one
     // Prefer common languages if available
@@ -103,35 +121,32 @@ function convertFiltersToDiscoverOptions(
 }
 
 export async function GET(request: NextRequest) {
+  // Apply rate limiting
+  const rateLimitResult = await applyRateLimit(request, rateLimiters.discover);
+  if (!rateLimitResult.allowed) {
+    return createRateLimitResponse(rateLimitResult.remaining, rateLimitResult.resetTime);
+  }
+
   try {
     const searchParams = request.nextUrl.searchParams;
-    const type = searchParams.get('type');
-    const pageParam = searchParams.get('page');
-    const filtersJson = searchParams.get('filters');
-    const sortOptionParam = searchParams.get('sortOption');
-    const sortDirectionParam = searchParams.get('sortDirection');
 
-    // Validate type parameter
-    if (!type || (type !== 'movie' && type !== 'tv')) {
+    // Validate and parse query parameters
+    const validationResult = discoverQuerySchema.safeParse({
+      type: searchParams.get('type'),
+      page: searchParams.get('page'),
+      filters: searchParams.get('filters'),
+      sortOption: searchParams.get('sortOption'),
+      sortDirection: searchParams.get('sortDirection'),
+    });
+
+    if (!validationResult.success) {
       return NextResponse.json(
-        { error: 'Invalid type. Must be "movie" or "tv"' },
+        { error: 'Invalid query parameters', details: validationResult.error.issues },
         { status: 400 }
       );
     }
 
-    // Parse parameters
-    const page = pageParam ? parseInt(pageParam, 10) : 1;
-    const filters: MediaFilter = filtersJson ? JSON.parse(filtersJson) : {};
-    const sortOption = (sortOptionParam || 'popularity') as SortOption;
-    const sortDirection = (sortDirectionParam || 'desc') as 'asc' | 'desc';
-
-    // Validate page number
-    if (isNaN(page) || page < 1) {
-      return NextResponse.json(
-        { error: 'Invalid page number' },
-        { status: 400 }
-      );
-    }
+    const { type, page, filters, sortOption, sortDirection } = validationResult.data;
 
     // Convert filters to TMDB discover options
     const discoverOptions = convertFiltersToDiscoverOptions(
@@ -164,18 +179,23 @@ export async function GET(request: NextRequest) {
       total_results: response.total_results,
     });
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const isValidationError = errorMessage.includes('Invalid') || errorMessage.includes('validation');
+
     logger.error('Error in discover API route', {
       context: 'DiscoverAPI',
       error: error instanceof Error ? error : new Error(String(error)),
       type: request.nextUrl.searchParams.get('type'),
+      userAgent: request.headers.get('user-agent'),
     });
 
     return NextResponse.json(
-      { 
-        error: 'Failed to fetch discover results',
-        details: error instanceof Error ? error.message : 'Unknown error'
+      {
+        error: isValidationError ? 'Invalid request parameters' : 'Failed to fetch discover results',
+        message: process.env.NODE_ENV === 'development' ? errorMessage : 'An internal error occurred',
+        timestamp: new Date().toISOString(),
       },
-      { status: 500 }
+      { status: isValidationError ? 400 : 500 }
     );
   }
 }

@@ -1,0 +1,12 @@
+{
+  "last_sync": "2025-11-13T18:07:53Z",
+  "source_version": "",
+  "sync_engine_version": "1.0.0",
+  "validation_status": "passed",
+  "transformed_files": [
+    "active-context.md",
+    "progress.md",
+    "decision-log.md",
+    "product-context.md"
+  ]
+}

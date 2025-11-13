@@ -1,0 +1,51 @@
+## Items
+| id | description | status | complexity | confidence | pattern_match | files | modules |
+| 1 | Empty catch block in PlayerFrame.tsx | fixed | 1 | 9 | 100% | components/PlayerFrame.tsx:130 | frontend |
+| 2 | console.warn in lib/tmdb.ts (should use logger) | fixed | 1 | 9 | 100% | lib/tmdb.ts:112 | backend |
+| 3 | CSP headers with unsafe-inline/unsafe-eval | fixed | 2 | 9 | 100% | next.config.mjs:31-32 | config |
+| 4 | dangerouslySetInnerHTML in movie/tv pages | fixed | 2 | 9 | 100% | app/movie/[id]/page.tsx:38, app/tv/[id]/page.tsx:42 | frontend |
+| 5 | any type in types/jsx.d.ts | fixed | 1 | 9 | 100% | types/jsx.d.ts:6 | types |
+| 6 | TODO comments in lib/auth.ts and lib/logger.ts | documented | 1 | 9 | 100% | lib/auth.ts:32, lib/logger.ts:57 | backend |
+| 7 | Comprehensive theming system implementation | completed | 3 | 9 | 100% | app/globals.css, tailwind.config.ts, components/theme-*.tsx, hooks/use-theme.ts | frontend |
+| 8 | Theme toggle functionality and settings integration | completed | 2 | 9 | 100% | components/theme-toggle.tsx, app/settings/page.tsx, hooks/use-theme.ts | frontend |
+| 9 | Frontend optimization Phase 3+ (React.memo, dynamic imports, API retry) | completed | 3 | 9 | 100% | components/ui/MediaCard.tsx, components/PlayerFrame.tsx, lib/tmdb.ts | frontend |
+| 10 | Next.js 15 dynamic import error fix | completed | 2 | 9 | 100% | app/page.tsx | frontend |
+| 11 | TV season page with episode list | completed | 2 | 9 | 100% | app/tv/[id]/season/[seasonNumber]/page.tsx | frontend |
+| 12 | Prisma build/postinstall configuration for Vercel | completed | 1 | 9 | 100% | package.json | config |
+| 13 | Type guard operator precedence fix | completed | 1 | 9 | 100% | lib/tmdb.ts | backend |
+| 14 | Multi-agent collaboration setup | completed | 2 | 9 | 100% | cursor_integration_agent.md, cursorkleosr/*.md | docs |
+| 15 | Vidora X-Frame-Options handling | completed | 2 | 9 | 100% | components/PlayerFrame.tsx, app/watch/[type]/[id]/page.tsx | frontend |
+| 16 | Next.js 15 PageProps adaptation (params as Promise) | completed | 2 | 9 | 100% | app/movie/[id]/page.tsx, app/tv/[id]/page.tsx | frontend |
+| 17 | Database unique constraint fixes for lists | completed | 2 | 9 | 100% | prisma/schema.prisma | database |
+| 18 | ENV_EXAMPLE documentation | completed | 1 | 9 | 100% | ENV_EXAMPLE | docs |
+| 19 | CSP headers for Vidora iframe and TMDB assets | completed | 2 | 9 | 100% | next.config.mjs | config |
+| 20 | Project consolidation and cleanup | completed | 2 | 10 | 100% | .gitignore,components/ui/*.tsx,README.md,cursorkleosr/workflow_state.md | config,frontend |
+| 21 | Replace console statements with logger in client components | completed | 1 | 10 | 100% | components/ui/MediaCardWithRemove.tsx,components/ui/MediaCardWithWatchlist.tsx,components/ui/ContentCarouselWithWatchlist.tsx,components/ui/WatchlistButton.tsx | frontend |
+| 22 | Update .gitignore with TypeScript build artifacts | completed | 1 | 10 | 100% | .gitignore | config |
+| 23 | Library redesign: watchlist categorization with Movies/TV Shows tabs | completed | 2 | 9 | 100% | app/library/page.tsx,app/library/LibraryPageClient.tsx,app/library/components/WatchlistSection.tsx | frontend |
+| 24 | Create filter/sort foundation (types and utilities) | completed | 2 | 9 | 100% | types/library.ts,lib/library-utils.ts | frontend |
+| 25 | Implement Filter/Sort UI with FilterSortBar component | completed | 3 | 9 | 100% | app/library/components/FilterSortBar.tsx,app/library/components/WatchlistSection.tsx,lib/tmdb-genres.ts | frontend |
+| 26 | Re-enable Custom Lists with CustomListsSection component | completed | 2 | 9 | 100% | app/library/components/CustomListsSection.tsx,app/library/LibraryPageClient.tsx | frontend |
+| 27 | Create Discovery page with Movies/TV Shows tabs | completed | 3 | 9 | 100% | app/discovery/page.tsx,app/discovery/DiscoveryPageClient.tsx,app/discovery/components/DiscoverySection.tsx,lib/tmdb.ts | frontend |
+| 28 | Add TMDB discover API functions | completed | 2 | 9 | 100% | lib/tmdb.ts | backend |
+| 29 | Implement dual range year slider with tooltips | completed | 3 | 9 | 100% | app/discovery/components/YearRangeSlider.tsx | frontend |
+| 30 | Replace regions with major languages filter | completed | 2 | 9 | 100% | lib/tmdb-languages.ts,app/discovery/components/FiltersPanel.tsx,app/api/discover/route.ts | frontend,backend |
+| 31 | Implement fixed sidebar filters layout | completed | 2 | 9 | 100% | app/discovery/components/FiltersPanel.tsx,app/discovery/components/DiscoverySection.tsx | frontend |
+| 32 | Update API route for year range and languages | completed | 2 | 9 | 100% | app/api/discover/route.ts | backend |
+| 33 | Fix console.error in DiscoverySection.tsx | completed | 1 | 10 | 100% | app/discovery/components/DiscoverySection.tsx | frontend |
+| 34 | Improve type safety in PlayerFrame.tsx | completed | 2 | 10 | 100% | components/PlayerFrame.tsx | frontend |
+| 35 | Remove unused imports | completed | 1 | 10 | 100% | app/discovery/components/DiscoverySection.tsx | frontend |
+| 36 | Create Top10TrendingSection component with selector | completed | 2 | 9 | 100% | components/ui/Top10TrendingSection.tsx | frontend |
+| 37 | Update ContentCarousel to support hideTitle and noSectionWrapper props | completed | 2 | 9 | 100% | components/ui/ContentCarousel.tsx, components/ui/ContentCarouselWithWatchlist.tsx | frontend |
+| 38 | Update home page to use unified Top 10 & Trending sections | completed | 2 | 9 | 100% | app/page.tsx | frontend |
+| 39 | Standardize error handling in metadata files | completed | 2 | 9 | 100% | app/tv/[id]/metadata.ts, app/movie/[id]/metadata.ts | frontend |
+| 40 | Standardize error handling in season page | completed | 2 | 9 | 100% | app/tv/[id]/season/[season]/page.tsx | frontend |
+| 41 | Improve error handling in DiscoverySection | completed | 2 | 9 | 100% | app/discovery/components/DiscoverySection.tsx | frontend |
+| 42 | Add comprehensive input validation to watch page | completed | 2 | 9 | 100% | app/watch/[type]/[id]/page.tsx | frontend |
+| 43 | Add error boundaries for discovery and settings pages | completed | 1 | 9 | 100% | app/discovery/error.tsx, app/settings/error.tsx | frontend |
+| 44 | Implement environment variable validation system | completed | 2 | 9 | 100% | lib/env.ts, lib/env-init.ts, lib/tmdb.ts, lib/db.ts, app/layout.tsx | backend, config |
+| 45 | Update performance optimizations to use validated env config | completed | 1 | 9 | 100% | lib/cache/redis-cache.ts, lib/rate-limit.ts | backend, config |
+| 46 | Add rate limiting to search API route | completed | 2 | 9 | 100% | app/api/search/route.ts, lib/utils/request.ts | backend |
+| 47 | Create shared utility for client IP extraction | completed | 1 | 9 | 100% | lib/utils/request.ts, app/api/discover/route.ts, app/api/search/route.ts | backend |
+| 48 | Set up Vitest test framework with React Testing Library | completed | 3 | 9 | 100% | vitest.config.ts, vitest.setup.ts, package.json | testing |
+| 49 | Write initial tests for utility functions | completed | 2 | 9 | 100% | lib/utils/request.test.ts, lib/library-utils.test.ts, lib/env.test.ts | testing |

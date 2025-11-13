@@ -62,11 +62,9 @@ export function filterItems<T extends EnrichedLibraryItem>(
     });
   }
 
-  // Filter by tags (future feature)
-  if (filter.tags && filter.tags.length > 0) {
-    // TODO: Implement tag filtering when tag feature is added
-    // For now, return all items
-  }
+  // Filter by tags (future feature - not yet implemented)
+  // Tag filtering will be added in a future release when user tagging is implemented
+  // For now, tag filters are ignored and all items are returned
 
   return filtered;
 }

@@ -2,10 +2,48 @@
 
 import { prisma } from '@/lib/db';
 import logger from '@/lib/logger';
+import { z } from 'zod';
 
 type MediaType = 'movie' | 'tv'; // Prisma MediaType enum
 
+// Validation schemas
+const createCustomListSchema = z.object({
+  userId: z.string().cuid('Invalid user ID'),
+  name: z.string().min(1, 'List name is required').max(100, 'List name too long'),
+});
+
+const addToListSchema = z.object({
+  listId: z.string().cuid('Invalid list ID'),
+  mediaType: z.enum(['movie', 'tv']),
+  tmdbId: z.number().int().positive('Invalid TMDB ID'),
+});
+
+const toggleWatchlistSchema = z.object({
+  userId: z.string().cuid('Invalid user ID'),
+  mediaType: z.enum(['movie', 'tv']),
+  tmdbId: z.number().int().positive('Invalid TMDB ID'),
+});
+
+const updateListNameSchema = z.object({
+  listId: z.string().cuid('Invalid list ID'),
+  name: z.string().min(1, 'List name is required').max(100, 'List name too long'),
+});
+
+const deleteListSchema = z.object({
+  listId: z.string().cuid('Invalid list ID'),
+});
+
+const createCustomListWithAuthSchema = z.object({
+  name: z.string().min(1, 'List name is required').max(100, 'List name too long'),
+});
+
 export async function createCustomList(userId: string, name: string) {
+  // Validate inputs
+  const validation = createCustomListSchema.safeParse({ userId, name });
+  if (!validation.success) {
+    throw new Error(`Validation failed: ${validation.error.issues.map(i => i.message).join(', ')}`);
+  }
+
   try {
     return await prisma.list.create({ data: { userId, name, type: 'custom' } });
   } catch (error) {
@@ -15,6 +53,12 @@ export async function createCustomList(userId: string, name: string) {
 }
 
 export async function addToList(params: { listId: string; mediaType: MediaType; tmdbId: number }) {
+  // Validate inputs
+  const validation = addToListSchema.safeParse(params);
+  if (!validation.success) {
+    throw new Error(`Validation failed: ${validation.error.issues.map(i => i.message).join(', ')}`);
+  }
+
   try {
     const { listId, mediaType, tmdbId } = params;
     return await prisma.listItem.upsert({
