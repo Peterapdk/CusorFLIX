@@ -156,4 +156,3 @@ describe('validateEnv', () => {
     expect(config2.tmdb.apiKey).toBe('new-api-key');
   });
 });
-
