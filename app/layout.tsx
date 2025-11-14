@@ -32,20 +32,27 @@ export default function RootLayout({
   return (
     <html lang="en" className={`scroll-smooth ${inter.variable}`}>
       <body className="min-h-screen bg-black text-white antialiased font-sans">
-        <div className="dark">
-          <a
-            href="#main-content"
-            className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-cinema-orange focus:text-white focus:rounded"
-          >
-            Skip to main content
-          </a>
-          <ErrorBoundary>
-            <Navbar />
-            <main id="main-content" className="relative">
-              {children}
-            </main>
-          </ErrorBoundary>
-        </div>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <div className="dark">
+            <a
+              href="#main-content"
+              className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-cinema-orange focus:text-white focus:rounded"
+            >
+              Skip to main content
+            </a>
+            <ErrorBoundary>
+              <Navbar />
+              <main id="main-content" className="relative">
+                {children}
+              </main>
+            </ErrorBoundary>
+          </div>
+        </ThemeProvider>
       </body>
     </html>
   );

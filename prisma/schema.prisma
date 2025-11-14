@@ -1,7 +1,6 @@
-// Datasource configured for Vercel Postgres via DATABASE_URL
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = "file:./dev.db"
 }
 
 generator client {
@@ -10,45 +9,31 @@ generator client {
 
 model User {
   id        String   @id @default(cuid())
-  email     String?  @unique
+  email     String   @unique
   name      String?
-  image     String?
-  lists     List[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  lists     List[]
 }
 
 model List {
   id        String     @id @default(cuid())
-  user      User       @relation(fields: [userId], references: [id])
   userId    String
-  name      String
-  type      ListType
+  user      User       @relation(fields: [userId], references: [id])
+  type      String // "watchlist", "favorites", etc.
+  name      String?
   items     ListItem[]
   createdAt DateTime   @default(now())
-
-  @@index([userId, type, createdAt])
+  updatedAt DateTime   @updatedAt
 }
 
 model ListItem {
-  id        String    @id @default(cuid())
-  list      List      @relation(fields: [listId], references: [id])
+  id        String   @id @default(cuid())
   listId    String
-  mediaType MediaType
+  list      List     @relation(fields: [listId], references: [id])
   tmdbId    Int
-  createdAt DateTime  @default(now())
+  mediaType String // "movie" or "tv"
+  createdAt DateTime @default(now())
 
   @@unique([listId, tmdbId, mediaType])
-  @@index([listId, mediaType, createdAt])
-  @@index([tmdbId, mediaType])
-}
-
-enum ListType {
-  watchlist
-  custom
-}
-
-enum MediaType {
-  movie
-  tv
 }
