@@ -31,14 +31,9 @@ export default function RootLayout({
 }) {
   console.log('RootLayout rendering');
   return (
-    <html lang="en" className={`scroll-smooth ${inter.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`scroll-smooth ${inter.variable}`}>
       <body className="min-h-screen bg-background text-foreground antialiased font-sans">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem
-          disableTransitionOnChange={false}
-        >
+        <div className="dark">
           <a
             href="#main-content"
             className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-cinema-orange focus:text-white focus:rounded"
@@ -51,7 +46,7 @@ export default function RootLayout({
               {children}
             </main>
           </ErrorBoundary>
-        </ThemeProvider>
+        </div>
       </body>
     </html>
   );
