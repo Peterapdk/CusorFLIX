@@ -6,6 +6,7 @@ import type { Route } from 'next';
 import { ThemeToggle } from '@/components/theme-toggle';
 
 export default function Navbar() {
+  console.log('Navbar rendering');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const navItems: Array<{ href: Route; label: string }> = [

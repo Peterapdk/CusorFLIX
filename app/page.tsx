@@ -98,9 +98,12 @@ async function TVShowsSection(userId: string) {
 
 // Main page component with shared user context
 async function HomePageContent() {
+  console.log('HomePageContent rendering');
   const userId = await getOrCreateDemoUser();
+  console.log('User ID:', userId);
   if (!userId) {
     // Fallback for when user creation fails
+    console.log('No user ID, showing fallback');
     return (
       <main className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
@@ -111,6 +114,7 @@ async function HomePageContent() {
     );
   }
 
+  console.log('Rendering main content');
   return (
     <main className="min-h-screen bg-background">
       {/* Hero Section with Suspense */}
