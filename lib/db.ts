@@ -9,7 +9,7 @@ const SLOW_QUERY_THRESHOLD_MS = 500;
 export const prisma =
   globalForPrisma.prisma ||
   new PrismaClient({
-    log: process.env.NODE_ENV === 'development' 
+    log: process.env.NODE_ENV === 'development'
       ? [
           {
             emit: 'event',
@@ -20,6 +20,17 @@ export const prisma =
         ]
       : ['error', 'warn'],
   });
+
+// Test database connection
+if (process.env.NODE_ENV !== 'development') {
+  prisma.$connect()
+    .then(() => {
+      console.log('Database connected successfully');
+    })
+    .catch((error) => {
+      console.error('Database connection failed:', error);
+    });
+}
 
 // Development query logging and slow query detection
 if (process.env.NODE_ENV === 'development') {

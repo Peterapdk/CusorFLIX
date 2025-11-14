@@ -99,38 +99,35 @@ async function TVShowsSection(userId: string) {
 // Main page component with shared user context
 async function HomePageContent() {
   console.log('HomePageContent rendering');
-  const userId = await getOrCreateDemoUser();
-  console.log('User ID:', userId);
-  if (!userId) {
-    // Fallback for when user creation fails
-    console.log('No user ID, showing fallback');
-    return (
-      <main className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-foreground mb-4">Unable to load content</h1>
-          <p className="text-muted-foreground">Please try refreshing the page.</p>
-        </div>
-      </main>
-    );
-  }
-
-  console.log('Rendering main content');
   return (
-    <main className="min-h-screen bg-background">
-      {/* Hero Section with Suspense */}
-      <Suspense fallback={<HeroSkeleton />}>
-        <HeroContent />
-      </Suspense>
-
-      {/* Content Sections with Suspense */}
-      <div className="relative z-10 -mt-32 space-y-8">
-        <Suspense fallback={<CarouselSkeleton />}>
-          {MoviesSection(userId)}
-        </Suspense>
-
-        <Suspense fallback={<CarouselSkeleton />}>
-          {TVShowsSection(userId)}
-        </Suspense>
+    <main className="min-h-screen bg-black text-white p-8">
+      <h1 className="text-4xl font-bold mb-4">CusorFLIX Debug Page</h1>
+      <p className="text-xl mb-4">If you can see this, the basic page is working!</p>
+      <div className="bg-gray-800 p-4 rounded">
+        <p>Testing database connection...</p>
+        {await (async () => {
+          try {
+            const userId = await getOrCreateDemoUser();
+            console.log('User ID:', userId);
+            return <p className="text-green-400">Database connected! User ID: {userId || 'null'}</p>;
+          } catch (error) {
+            console.error('Database error:', error);
+            return <p className="text-red-400">Database error: {String(error)}</p>;
+          }
+        })()}
+      </div>
+      <div className="bg-gray-800 p-4 rounded mt-4">
+        <p>Testing TMDB API...</p>
+        {await (async () => {
+          try {
+            const result = await tmdbEnhanced.getTrending('movie', 'week');
+            console.log('TMDB result:', result);
+            return <p className="text-green-400">TMDB API working! Found {result.results?.length || 0} movies</p>;
+          } catch (error) {
+            console.error('TMDB error:', error);
+            return <p className="text-red-400">TMDB API error: {String(error)}</p>;
+          }
+        })()}
       </div>
     </main>
   );

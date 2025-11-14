@@ -9,7 +9,6 @@ const inter = Inter({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-inter',
-  preload: true,
   fallback: ['system-ui', 'arial'],
 });
 
@@ -32,7 +31,7 @@ export default function RootLayout({
   console.log('RootLayout rendering');
   return (
     <html lang="en" className={`scroll-smooth ${inter.variable}`}>
-      <body className="min-h-screen bg-background text-foreground antialiased font-sans">
+      <body className="min-h-screen bg-black text-white antialiased font-sans">
         <div className="dark">
           <a
             href="#main-content"
