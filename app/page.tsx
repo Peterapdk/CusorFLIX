@@ -10,10 +10,8 @@ import { isMovie, isTVShow } from '@/types/tmdb';
 import { getOrCreateDemoUser } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 
-// Use dynamic rendering to ensure environment variables are available at runtime
-// This prevents build-time errors when TMDB API keys are not available during build
 export const dynamic = 'force-dynamic';
-export const revalidate = 0; // Disable static generation for now
+export const revalidate = 3600; // Revalidate every hour
 
 async function getWatchlistIds(userId: string | null): Promise<number[]> {
   if (!userId) return [];
@@ -31,7 +29,6 @@ async function getWatchlistIds(userId: string | null): Promise<number[]> {
   }
 }
 
-// Async component for hero section
 async function HeroContent() {
   const movies = await tmdbEnhanced.getTrending('movie', 'week').catch((error) => {
     logger.error('Error loading hero content', { context: 'HomePage', error: error instanceof Error ? error : new Error(String(error)) });
@@ -46,8 +43,7 @@ async function HeroContent() {
   return <HeroSection featuredContent={moviesWithType[0]} />;
 }
 
-// Async component for movies with Top 10 & Trending selector
-async function MoviesSection(userId: string) {
+async function MoviesSection({ userId }: { userId: string }) {
   const watchlistIds = await getWatchlistIds(userId);
   
   const movies = await tmdbEnhanced.getTrending('movie', 'week').catch((error) => {
@@ -71,8 +67,7 @@ async function MoviesSection(userId: string) {
   );
 }
 
-// Async component for TV shows with Top 10 & Trending selector
-async function TVShowsSection(userId: string) {
+async function TVShowsSection({ userId }: { userId: string }) {
   const watchlistIds = await getWatchlistIds(userId);
   
   const tv = await tmdbEnhanced.getTrending('tv', 'week').catch((error) => {
@@ -96,43 +91,33 @@ async function TVShowsSection(userId: string) {
   );
 }
 
-// Main page component with shared user context
-async function HomePageContent() {
-  console.log('HomePageContent rendering');
-  return (
-    <main className="min-h-screen bg-black text-white p-8">
-      <h1 className="text-4xl font-bold mb-4">CusorFLIX Debug Page</h1>
-      <p className="text-xl mb-4">If you can see this, the basic page is working!</p>
-      <div className="bg-gray-800 p-4 rounded">
-        <p>Testing database connection...</p>
-        {await (async () => {
-          try {
-            const userId = await getOrCreateDemoUser();
-            console.log('User ID:', userId);
-            return <p className="text-green-400">Database connected! User ID: {userId || 'null'}</p>;
-          } catch (error) {
-            console.error('Database error:', error);
-            return <p className="text-red-400">Database error: {String(error)}</p>;
-          }
-        })()}
-      </div>
-      <div className="bg-gray-800 p-4 rounded mt-4">
-        <p>Testing TMDB API...</p>
-        {await (async () => {
-          try {
-            const result = await tmdbEnhanced.getTrending('movie', 'week');
-            console.log('TMDB result:', result);
-            return <p className="text-green-400">TMDB API working! Found {result.results?.length || 0} movies</p>;
-          } catch (error) {
-            console.error('TMDB error:', error);
-            return <p className="text-red-400">TMDB API error: {String(error)}</p>;
-          }
-        })()}
-      </div>
-    </main>
-  );
-}
+export default async function HomePage() {
+  const userId = await getOrCreateDemoUser();
 
-export default function HomePage() {
-  return <HomePageContent />;
+  if (!userId) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <p className="text-white">Failed to load user data. Please try again later.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col">
+      <Suspense fallback={<HeroSkeleton />}>
+        <HeroContent />
+      </Suspense>
+
+      <div className="py-12">
+        <div className="container mx-auto px-4 md:px-6">
+          <Suspense fallback={<CarouselSkeleton />}>
+            <MoviesSection userId={userId} />
+          </Suspense>
+          <Suspense fallback={<CarouselSkeleton />}>
+            <TVShowsSection userId={userId} />
+          </Suspense>
+        </div>
+      </div>
+    </div>
+  );
 }
