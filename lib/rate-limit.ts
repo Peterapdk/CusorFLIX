@@ -7,18 +7,22 @@ import type { NextRequest } from 'next/server';
 let redis: Redis | null = null;
 
 try {
-  const redisUrl = process.env.UPSTASH_REDIS_REST_URL;
-  const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN;
+  const redisUrl = process.env.UPSTASH_REDIS_REST_URL?.trim();
+  const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN?.trim();
 
-  if (redisUrl && redisToken) {
+  if (redisUrl && redisToken && redisUrl.startsWith('https://') && redisToken.length > 20) {
     redis = new Redis({
       url: redisUrl,
       token: redisToken,
     });
     logger.info('Redis rate limiter initialized', { context: 'RateLimiter' });
   } else {
-    logger.warn('Redis rate limiter not configured - UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN required', {
+    logger.warn('Redis rate limiter not configured or invalid - UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN required', {
       context: 'RateLimiter',
+      hasUrl: !!redisUrl,
+      hasToken: !!redisToken,
+      urlValid: redisUrl?.startsWith('https://'),
+      tokenLength: redisToken?.length,
     });
   }
 } catch (error) {
@@ -26,6 +30,8 @@ try {
     context: 'RateLimiter',
     error: error instanceof Error ? error : new Error(String(error)),
   });
+  // Ensure redis is null on error
+  redis = null;
 }
 
 /**
