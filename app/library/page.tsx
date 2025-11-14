@@ -139,7 +139,7 @@ export default async function LibraryPage() {
     <LibraryPageClient 
       watchlistMovies={enrichedWatchlistMovies}
       watchlistTVShows={enrichedWatchlistTVShows}
-      customLists={enrichedCustomLists.filter(list => list.name) as any}
+      customLists={enrichedCustomLists.filter(list => list.name)}
     />
   );
 }
